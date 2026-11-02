@@ -6,7 +6,7 @@
 //  Ne mets JAMAIS ici la clé "service_role" / "secret".
 // =============================================================
 window.CHAMANIA_CONFIG = {
-  SUPABASE_URL: "https://szaxvtqnrhqficugyiju.supabase.co/rest/v1/",
+  SUPABASE_URL: "https://szaxvtqnrhqficugyiju.supabase.co",
   SUPABASE_KEY: "sb_publishable_7JdzTkkeL6LWs7y3dkaxxg_VcN_xALq",
 
   // Compte d'équipe créé par le script supabase/code-pin.sql (ne pas modifier)
