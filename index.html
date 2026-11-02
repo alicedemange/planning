@@ -266,8 +266,9 @@ label.f span.h{font-weight:400;color:var(--muted)}
 .whos{display:grid;gap:8px}
 .whos button{display:flex;align-items:center;gap:12px;border:1px solid var(--line);background:var(--paper);border-radius:12px;padding:10px 14px;font-size:18px;font-weight:700;text-align:left}
 .whos button:hover{border-color:var(--rose)}
-.teamrow{display:flex;gap:8px;align-items:center}
-.teamrow input[type=text]{flex:1}
+.teamrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.teamrow input[type=text]{flex:1 0 140px;min-width:0;width:auto}
+.addc input{min-width:0}
 .teamrow .swatches{display:flex;gap:4px}
 .teamrow .swatches button{width:22px;height:22px;border-radius:50%;border:2px solid transparent}
 .teamrow .swatches button[aria-pressed="true"]{border-color:var(--ink)}
@@ -320,6 +321,17 @@ body.logged-out header.top, body.logged-out nav.tabs, body.logged-out #summary, 
 .login-card p{margin:0;text-align:center;color:var(--muted)}
 .login-err{background:var(--late-wash);color:var(--late);border-radius:10px;padding:8px 12px;font-weight:500;font-size:14px}
 .login-card .btn{justify-content:center;padding:12px}
+.pin-dots{display:flex;gap:14px;justify-content:center;margin:4px 0}
+.pin-dots i{width:16px;height:16px;border-radius:50%;border:2px solid var(--rose-pale);transition:background .15s}
+.pin-dots i.on{background:var(--rose);border-color:var(--rose)}
+.pin-dots.wait i{opacity:.5}
+.pin-dots.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.pin-input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+.pinpad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.pinpad button{height:60px;border-radius:16px;border:1px solid var(--line);background:var(--creme);font-size:26px;font-weight:500}
+.pinpad button:active{background:var(--rose-wash);border-color:var(--rose-pale)}
+.login-err[hidden]{display:none}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -329,7 +341,7 @@ body.logged-out header.top, body.logged-out nav.tabs, body.logged-out #summary, 
     <svg class="heart" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 35 C8 26 3 19 3 12.5 C3 7.5 7 4 11.5 4 C15 4 18 6 20 9 C22 6 25 4 28.5 4 C33 4 37 7.5 37 12.5 C37 19 32 26 20 35Z" fill="#f75b95"/><path d="M13 21 l2-5 2 3 h6 l2-3 2 5 c0 4-3 7-7 7 s-7-3-7-7z" fill="#fffcf7"/><circle cx="17.5" cy="22" r="1" fill="#1f1a1d"/><circle cx="22.5" cy="22" r="1" fill="#1f1a1d"/></svg>
     <div><h1>Cha'mania</h1><small>Planning des réseaux sociaux</small></div>
   </div>
-  <button class="me-btn" data-action="profile" id="me-btn" type="button"><span class="avatar empty">?</span><span>Mon compte</span></button>
+  <button class="me-btn" data-action="profile" id="me-btn" type="button"><span class="avatar empty">?</span><span>Qui es-tu ?</span></button>
   <button class="btn ghost" data-action="team" type="button" title="Gérer l'équipe"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><circle cx="17" cy="9" r="2.6"/><path d="M16 14.6c2.8-.2 4.9 1.5 5.5 4.4"/></svg><span class="teambtn-label">Équipe</span></button>
   <button class="btn primary newbtn" data-action="new" type="button" id="new-btn">+ Nouveau post</button>
 </header>
@@ -387,6 +399,7 @@ const S = {
   openDetailId:null, error:null
 };
 try{ S.mineOnly = localStorage.getItem("chamania-mine")==="1"; }catch(e){}
+try{ S.me = localStorage.getItem("chamania-me"); }catch(e){}
 
 /* ================== Utilitaires ================== */
 const $ = s => document.querySelector(s);
@@ -443,7 +456,7 @@ const fullCaption = p => [p.caption||"", p.hashtags||""].filter(Boolean).join("\
 /* ================== Données (Supabase) ================== */
 const normPost = r => ({...r, date:r.date||"", time:r.time?String(r.time).slice(0,5):"", assignee:r.assignee||"", media:Array.isArray(r.media)?r.media:[], published:r.published||{}, platforms:r.platforms||[]});
 async function loadPosts(){ const {data,error} = await S.sb.from("posts").select("*"); if(error) throw error; S.posts = data.map(normPost); }
-async function loadTeam(){ const {data,error} = await S.sb.from("profiles").select("*").order("created_at"); if(error) throw error; S.team = data.map(p => ({id:p.id, name:p.display_name||p.username||"Sans nom", username:p.username, color:p.color||"#f75b95", is_admin:!!p.is_admin})); }
+async function loadTeam(){ const {data,error} = await S.sb.from("membres").select("*").order("created_at"); if(error) throw error; S.team = data.map(p => ({id:p.id, name:p.name||"Sans nom", color:p.color||"#f75b95"})); }
 async function loadComments(){ const {data,error} = await S.sb.from("comments").select("*").order("created_at"); if(error) throw error; S.comments = data; }
 const pending = {};
 function refreshSoon(what){
@@ -462,7 +475,7 @@ function subscribe(){
   channel = S.sb.channel("planning")
     .on("postgres_changes", {event:"*", schema:"public", table:"posts"}, () => refreshSoon("posts"))
     .on("postgres_changes", {event:"*", schema:"public", table:"comments"}, () => refreshSoon("comments"))
-    .on("postgres_changes", {event:"*", schema:"public", table:"profiles"}, () => refreshSoon("team"))
+    .on("postgres_changes", {event:"*", schema:"public", table:"membres"}, () => refreshSoon("team"))
     .subscribe();
 }
 document.addEventListener("visibilitychange", () => { if(!document.hidden && S.session){ refreshSoon("posts"); refreshSoon("comments"); } });
@@ -490,9 +503,10 @@ const getPost = id => S.posts.find(p => p.id === id);
 
 async function markPublished(id, pf){
   const p = getPost(id); if(!p) return;
+  if(!meM()){ openWhoAmI(() => markPublished(id, pf)); return; }
   p.published = {...p.published, [pf]:{at:new Date().toISOString(), by:S.me}};
   const done = allPub(p); render();
-  await run(S.sb.rpc("set_published", {p_post:id, p_platform:pf}), done ? "Bravo, c'est publié partout !" : `Noté : publié sur ${PF[pf].label}.`);
+  await run(S.sb.rpc("set_published", {p_post:id, p_platform:pf, p_by:S.me}), done ? "Bravo, c'est publié partout !" : `Noté : publié sur ${PF[pf].label}.`);
   refreshSoon("posts");
 }
 async function unmarkPublished(id, pf){
@@ -501,7 +515,7 @@ async function unmarkPublished(id, pf){
   await run(S.sb.rpc("set_published", {p_post:id, p_platform:pf, p_unset:true}));
   refreshSoon("posts");
 }
-async function takePost(id){ await patchPost(id, {assignee:S.me}, "C'est noté, ce post est pour toi."); }
+async function takePost(id){ if(!meM()){ openWhoAmI(() => takePost(id)); return; } await patchPost(id, {assignee:S.me}, "C'est noté, ce post est pour toi."); }
 async function removeFiles(paths){ if(paths.length) await S.sb.storage.from(BUCKET).remove(paths); }
 
 /* ================== Rendu général ================== */
@@ -530,7 +544,7 @@ function render(){
 }
 function renderMe(){
   const m = meM(), b = $("#me-btn");
-  b.innerHTML = m ? `${avatarHTML(m.id)}<span>${esc(m.name)}</span>` : `<span class="avatar empty">?</span><span>Mon compte</span>`;
+  b.innerHTML = m ? `${avatarHTML(m.id)}<span>${esc(m.name)}</span>` : `<span class="avatar empty">?</span><span>Qui es-tu ?</span>`;
 }
 function renderSummary(){
   const el = $("#summary");
@@ -873,7 +887,7 @@ async function saveEditor(){
   };
   $("#f-save").disabled = true;
   let id = ED.id;
-  const res = id ? await S.sb.from("posts").update(data).eq("id", id) : await S.sb.from("posts").insert(data).select("id").single();
+  const res = id ? await S.sb.from("posts").update(data).eq("id", id) : await S.sb.from("posts").insert({...data, created_by:meM()?S.me:null}).select("id").single();
   if(res.error){ toast(failMsg(res.error)); const b=$("#f-save"); if(b) b.disabled=false; return; }
   if(!id) id = res.data.id;
   // Supprime du stockage les visuels retirés du post
@@ -887,52 +901,64 @@ async function saveEditor(){
   render(); openDetail(id);
 }
 
-/* ---- Mon compte ---- */
-function openProfile(){
-  const m = meM() || {name:"", color:MEMBER_COLORS[0]};
-  let color = m.color;
-  openOv(1, `<form class="modal narrow" role="dialog" aria-modal="true" aria-labelledby="pr-t" id="profile-form">
-    <div class="m-head"><h2 id="pr-t">Mon compte</h2><button class="x" type="button" data-action="close1" aria-label="Fermer">×</button></div>
-    <div class="m-body">
-      <p class="hint" style="margin:0">Identifiant de connexion : <b>${esc(m.username||S.session?.user?.email||"")}</b></p>
-      <label class="f">Prénom affiché<input type="text" id="pr-name" value="${esc(m.name)}" required></label>
-      <div class="sec"><h4>Ma couleur</h4><div class="teamrow"><div class="swatches" id="pr-sw">${MEMBER_COLORS.map(c=>`<button type="button" style="background:${c}" aria-label="Couleur" aria-pressed="${c===color}" data-c="${c}"></button>`).join("")}</div></div></div>
-      <div class="sec"><h4>Changer mon mot de passe</h4><label class="f"><span class="sr">Nouveau mot de passe</span><input type="password" class="inp" id="pr-pass" placeholder="Nouveau mot de passe (8 caractères minimum)" autocomplete="new-password"></label></div>
-    </div>
-    <div class="m-foot"><button class="btn ghost danger" type="button" data-action="logout">Me déconnecter</button><span class="spacer"></span><button class="btn primary" type="submit">Enregistrer</button></div></form>`, "profile");
-  $("#pr-sw").querySelectorAll("[data-c]").forEach(b => b.onclick = () => { color=b.dataset.c; $("#pr-sw").querySelectorAll("[data-c]").forEach(x=>x.setAttribute("aria-pressed", x.dataset.c===color)); });
-  $("#profile-form").onsubmit = async e => {
-    e.preventDefault();
-    const name = $("#pr-name").value.trim(), pass = $("#pr-pass").value;
-    if(pass && pass.length < 8){ toast("Le mot de passe doit faire au moins 8 caractères."); return; }
-    const ok = await run(S.sb.from("profiles").update({display_name:name||null, color}).eq("id", S.me));
-    if(!ok) return;
-    if(pass){ const {error} = await S.sb.auth.updateUser({password:pass}); if(error){ toast("Le mot de passe n'a pas pu être changé : "+error.message); return; } }
-    await loadTeam().catch(()=>{}); closeOv(1); render(); toast(pass ? "Profil et mot de passe enregistrés." : "Profil enregistré.");
+/* ---- Qui es-tu ? ---- */
+function setMe(id){ S.me=id; try{ localStorage.setItem("chamania-me", id); }catch(e){} render(); }
+function openWhoAmI(after){
+  const list = S.team.map(m => `<button type="button" data-pick="${esc(m.id)}"${m.id===S.me?' style="border-color:var(--rose);background:var(--rose-wash)"':""}>${avatarHTML(m.id,36)}${esc(m.name)}</button>`).join("");
+  openOv(2, `<div class="modal narrow" role="dialog" aria-modal="true" aria-labelledby="w-t"><div class="m-head"><h2 id="w-t">Qui es-tu ?</h2><button class="x" type="button" data-action="close2" aria-label="Fermer">×</button></div>
+    <div class="m-body"><p style="margin:0" class="hint">Touche ton prénom. On s'en souvient sur cet appareil.</p>
+    ${list ? `<div class="whos">${list}</div>` : ""}
+    <form class="addc" id="w-add"><label class="sr" for="w-name">Ton prénom</label><input id="w-name" type="text" placeholder="${list?"Pas dans la liste ? Ton prénom":"Ton prénom"}" autocomplete="given-name"><button class="btn small primary" type="submit">M'ajouter</button></form></div>
+    <div class="m-foot"><button class="btn ghost" type="button" data-action="team">Gérer l'équipe</button><span class="spacer"></span><button class="btn ghost danger" type="button" data-action="logout">Verrouiller l'appli</button></div></div>`);
+  $("#ov2").querySelectorAll("[data-pick]").forEach(b => b.onclick = () => { setMe(b.dataset.pick); closeOv(2); after && after(); });
+  $("#w-add").onsubmit = async e => {
+    e.preventDefault(); const name=$("#w-name").value.trim(); if(!name) return;
+    const {data, error} = await S.sb.from("membres").insert({name, color:MEMBER_COLORS[S.team.length % MEMBER_COLORS.length]}).select("id").single();
+    if(error){ toast(failMsg(error)); return; }
+    await loadTeam().catch(()=>{}); setMe(data.id); closeOv(2); toast(`Bienvenue ${name} !`); after && after();
   };
 }
 
 /* ---- Équipe ---- */
 function openTeam(){
-  const admin = !!meM()?.is_admin;
-  const rows = S.team.map(m => `<div class="teamrow" data-id="${esc(m.id)}">${avatarHTML(m.id)}
-      ${admin ? `<label class="sr" for="tn-${esc(m.id)}">Prénom</label><input class="inp" type="text" id="tn-${esc(m.id)}" value="${esc(m.name)}">
-      <div class="swatches">${MEMBER_COLORS.map(c=>`<button type="button" style="background:${c}" aria-label="Couleur" aria-pressed="${c===m.color}" data-c="${c}"></button>`).join("")}</div>`
-      : `<span style="flex:1;font-weight:700">${esc(m.name)}</span>`}
-      <span class="hint">${esc(m.username||"")}${m.is_admin?" · admin":""}</span></div>`).join("");
+  closeOv(2);
+  let draft = S.team.map(m => ({...m}));
+  const removed = [];
+  const draw = () => {
+    $("#t-rows").innerHTML = draft.map((m,i) => `<div class="teamrow"><span class="avatar" style="background:${esc(m.color)}">${esc(initials(m.name))}</span>
+      <label class="sr" for="tn-${i}">Prénom</label><input class="inp" type="text" id="tn-${i}" data-i="${i}" value="${esc(m.name)}">
+      <div class="swatches">${MEMBER_COLORS.map(c=>`<button type="button" style="background:${c}" aria-label="Couleur" aria-pressed="${c===m.color}" data-i="${i}" data-c="${c}"></button>`).join("")}</div>
+      <button class="x" type="button" data-rm="${i}" aria-label="Retirer ${esc(m.name)}">×</button></div>`).join("") || `<p class="hint">Personne pour l'instant.</p>`;
+    $("#t-rows").querySelectorAll("input").forEach(inp => inp.oninput = () => { draft[+inp.dataset.i].name = inp.value; });
+    $("#t-rows").querySelectorAll("[data-c]").forEach(b => b.onclick = () => { draft[+b.dataset.i].color = b.dataset.c; draw(); });
+    $("#t-rows").querySelectorAll("[data-rm]").forEach(b => b.onclick = () => { const [m] = draft.splice(+b.dataset.rm,1); if(m.id) removed.push(m.id); draw(); });
+  };
   openOv(1, `<div class="modal narrow" role="dialog" aria-modal="true" aria-labelledby="t-t"><div class="m-head"><h2 id="t-t">L'équipe réseaux</h2><button class="x" type="button" data-action="close1" aria-label="Fermer">×</button></div>
-    <div class="m-body"><p class="hint" style="margin:0">Chaque personne a sa couleur : on voit tout de suite qui poste quoi.</p><div id="t-rows" style="display:flex;flex-direction:column;gap:8px">${rows}</div>
-    ${admin ? `<div class="notes"><b>Ajouter quelqu'un</b><br>Dans Supabase : Authentication › Users › Add user › Create new user.<br>E-mail : <b>prenom@${esc(CFG.LOGIN_DOMAIN||"chamania.local")}</b>, un mot de passe, et coche « Auto Confirm User ».<br>Elle se connectera ici avec l'identifiant <b>prenom</b>.</div>` : ""}</div>
-    ${admin ? `<div class="m-foot"><span class="spacer"></span><button class="btn" type="button" data-action="close1">Fermer</button><button class="btn primary" type="button" id="t-save">Enregistrer</button></div>` : ""}</div>`, "team");
-  if(!admin) return;
-  const draft = {}; S.team.forEach(m => draft[m.id] = {name:m.name, color:m.color});
-  $("#t-rows").querySelectorAll(".teamrow").forEach(row => {
-    const id = row.dataset.id;
-    row.querySelector("input").oninput = e => draft[id].name = e.target.value;
-    row.querySelectorAll("[data-c]").forEach(b => b.onclick = () => { draft[id].color=b.dataset.c; row.querySelectorAll("[data-c]").forEach(x=>x.setAttribute("aria-pressed", x.dataset.c===b.dataset.c)); row.querySelector(".avatar").style.background=b.dataset.c; });
-  });
+    <div class="m-body"><p class="hint" style="margin:0">Chaque personne a sa couleur : on voit tout de suite qui poste quoi.</p><div id="t-rows" style="display:flex;flex-direction:column;gap:8px"></div>
+    <button class="btn small" type="button" id="t-add">+ Ajouter quelqu'un</button>
+    <div class="sec" style="margin-top:6px"><h4>Code d'accès de l'équipe</h4>
+      <div class="addc"><label class="sr" for="t-pin">Nouveau code</label><input id="t-pin" type="password" inputmode="numeric" autocomplete="new-password" placeholder="Nouveau code (6 chiffres)" maxlength="12"><button class="btn small" type="button" id="t-pin-btn">Changer le code</button></div>
+      <p class="hint" style="margin:6px 0 0">Le nouveau code vaut pour toute l'équipe : pense à le leur donner.</p></div></div>
+    <div class="m-foot"><span class="spacer"></span><button class="btn" type="button" data-action="close1">Annuler</button><button class="btn primary" type="button" id="t-save">Enregistrer</button></div></div>`, "team");
+  draw();
+  $("#t-add").onclick = () => { draft.push({id:null, name:"", color:MEMBER_COLORS[draft.length % MEMBER_COLORS.length]}); draw(); $("#tn-"+(draft.length-1)).focus(); };
+  $("#t-pin-btn").onclick = () => {
+    const pin = $("#t-pin").value.trim();
+    if(!/^\d{6,}$/.test(pin)){ toast("Le code doit faire au moins 6 chiffres."); return; }
+    confirmBox("Changer le code de l'équipe ?", `Le nouveau code sera ${pin}. Les téléphones déjà ouverts restent connectés ; les autres devront taper ce nouveau code.`, "Changer le code", async () => {
+      const {error} = await S.sb.auth.updateUser({password:pin});
+      if(error){ toast("Le code n'a pas pu être changé : " + error.message); return; }
+      $("#t-pin").value = ""; toast("Code changé. Pense à le donner à l'équipe !");
+    });
+  };
   $("#t-save").onclick = async () => {
-    for(const m of S.team){ const d = draft[m.id]; if(d.name.trim()!==m.name || d.color!==m.color){ const ok = await run(S.sb.from("profiles").update({display_name:d.name.trim()||null, color:d.color}).eq("id", m.id)); if(!ok) return; } }
+    for(const m of draft){
+      const name = m.name.trim(); if(!name) continue;
+      const old = S.team.find(x => x.id===m.id);
+      if(!m.id){ if(!await run(S.sb.from("membres").insert({name, color:m.color}))) return; }
+      else if(old && (old.name!==name || old.color!==m.color)){ if(!await run(S.sb.from("membres").update({name, color:m.color}).eq("id", m.id))) return; }
+    }
+    for(const id of removed){ if(!await run(S.sb.from("membres").delete().eq("id", id))) return; if(id===S.me){ S.me=null; try{ localStorage.removeItem("chamania-me"); }catch(e){} } }
     await loadTeam().catch(()=>{}); closeOv(1); render(); toast("Équipe enregistrée.");
   };
 }
@@ -945,7 +971,7 @@ document.addEventListener("click", async e => {
     if(act==="selday"){ if(e.target.closest("[data-open]")) { openDetail(e.target.closest("[data-open]").dataset.open); return; } S.selDay=a.dataset.day; render(); return; }
     switch(act){
       case "new": openEditor(null, a.dataset.day); break;
-      case "profile": openProfile(); break;
+      case "profile": openWhoAmI(); break;
       case "team": openTeam(); break;
       case "logout": closeOv(1); await S.sb.auth.signOut(); break;
       case "close1": closeOv(1); break;
@@ -989,12 +1015,12 @@ document.addEventListener("submit", async e => {
   const f = e.target, act = f.dataset.action;
   if(act==="quick-idea"){ e.preventDefault(); const inp=f.querySelector("input"); const title=inp.value.trim(); if(!title) return;
     inp.value="";
-    const ok = await run(S.sb.from("posts").insert({title, status:"idee", rubrique:"autre"}), "Idée notée !");
+    const ok = await run(S.sb.from("posts").insert({title, status:"idee", rubrique:"autre", created_by:meM()?S.me:null}), "Idée notée !");
     if(ok){ await loadPosts().catch(()=>{}); render(); setTimeout(()=>$("#quick-idea")?.focus(),50); }
   }
   if(act==="comment"){ e.preventDefault(); const inp=f.querySelector("input"); const text=inp.value.trim(); if(!text) return;
     inp.value=""; inp.blur();
-    const ok = await run(S.sb.from("comments").insert({post_id:f.dataset.id, text}));
+    const ok = await run(S.sb.from("comments").insert({post_id:f.dataset.id, text, author:meM()?S.me:null}));
     if(ok){ await loadComments().catch(()=>{}); render(); }
   }
 });
@@ -1019,37 +1045,57 @@ async function downloadMedia(id, i, btn){
   btn.textContent = old; btn.disabled = false;
 }
 
-/* ================== Connexion ================== */
+/* ================== Connexion par code PIN ================== */
+const PIN_LEN = 6;
 function renderLogin(msg){
   document.body.classList.add("logged-out");
   $("#summary").innerHTML = "";
-  $("#main").innerHTML = `<div class="login"><form class="login-card" id="login-form">
-    ${HEART}<h1>Cha'mania</h1><p>Planning des réseaux sociaux</p>
-    ${msg?`<div class="login-err" role="alert">${esc(msg)}</div>`:""}
-    <label class="f">Identifiant<input type="text" id="l-id" autocomplete="username" autocapitalize="none" spellcheck="false" required autofocus></label>
-    <label class="f">Mot de passe<input type="password" id="l-pass" autocomplete="current-password" required></label>
-    <button class="btn primary" type="submit" id="l-btn">Se connecter</button>
-    <p class="hint">Identifiant oublié ? Demande à Alice.</p></form></div>`;
-  $("#login-form").onsubmit = async e => {
-    e.preventDefault();
-    const raw = $("#l-id").value.trim().toLowerCase(), pass = $("#l-pass").value;
-    const email = raw.includes("@") ? raw : `${raw}@${CFG.LOGIN_DOMAIN||"chamania.local"}`;
-    $("#l-btn").disabled = true; $("#l-btn").textContent = "Connexion…";
-    const {error} = await S.sb.auth.signInWithPassword({email, password:pass});
-    if(error) renderLogin(/invalid/i.test(error.message) ? "Identifiant ou mot de passe incorrect." : "Connexion impossible : " + error.message);
+  const keys = ["1","2","3","4","5","6","7","8","9","","0","⌫"];
+  $("#main").innerHTML = `<div class="login"><form class="login-card" id="login-form" autocomplete="off">
+    ${HEART}<h1>Cha'mania</h1><p>Tape le code de l'équipe</p>
+    <div class="pin-dots" aria-hidden="true">${Array.from({length:PIN_LEN},()=>"<i></i>").join("")}</div>
+    <label class="sr" for="pin">Code</label>
+    <input id="pin" class="pin-input" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="${PIN_LEN}" autocomplete="current-password">
+    <div class="login-err" role="alert" ${msg?"":"hidden"}>${esc(msg||"")}</div>
+    <div class="pinpad">${keys.map(k => k==="" ? "<span></span>" : `<button type="button" data-k="${k}" ${k==="⌫"?'aria-label="Effacer"':""}>${k}</button>`).join("")}</div>
+    <p class="hint">Code oublié ? Demande à Alice.</p></form></div>`;
+  const inp = $("#pin"), dots = [...document.querySelectorAll(".pin-dots i")];
+  let busy = false;
+  const sync = () => {
+    inp.value = inp.value.replace(/\D/g,"").slice(0,PIN_LEN);
+    dots.forEach((d,i) => d.classList.toggle("on", i < inp.value.length));
+    if(inp.value.length === PIN_LEN) submit();
   };
-  setTimeout(()=>$("#l-id")?.focus(), 30);
+  const submit = async () => {
+    if(busy) return; busy = true;
+    document.querySelector(".pin-dots").classList.add("wait");
+    const {error} = await S.sb.auth.signInWithPassword({email: CFG.TEAM_EMAIL || "equipe@chamania.local", password: inp.value});
+    busy = false;
+    if(error){
+      const m = /invalid/i.test(error.message) ? "Code incorrect, réessaie." : /rate|many/i.test(error.message) ? "Trop d'essais : patiente quelques minutes." : "Connexion impossible : " + error.message;
+      renderLogin(m); document.querySelector(".pin-dots")?.classList.add("shake");
+    }
+  };
+  inp.addEventListener("input", sync);
+  document.querySelectorAll(".pinpad [data-k]").forEach(b => b.onclick = () => {
+    if(b.dataset.k==="⌫") inp.value = inp.value.slice(0,-1); else inp.value += b.dataset.k;
+    sync();
+  });
+  $("#login-form").onsubmit = e => { e.preventDefault(); if(inp.value.length) submit(); };
+  // Sur ordinateur on peut taper au clavier directement
+  if(!/Android|iPhone|iPad/i.test(navigator.userAgent)) setTimeout(()=>inp.focus(), 30);
 }
 
 async function onSession(session){
   const was = S.session?.user?.id;
-  S.session = session; S.me = session?.user?.id || null;
+  S.session = session;
   if(!session){ S.loaded=false; S.posts=[]; S.comments=[]; S.team=[]; if(channel){ S.sb.removeChannel(channel); channel=null; } closeOv(1); closeOv(2); renderLogin(); return; }
-  if(was === S.me && S.loaded) return;
+  if(was === session.user.id && S.loaded) return;
   render();
   try{ await loadAll(); subscribe(); }
   catch(e){ console.error(e); S.error = "Le planning n'a pas pu être chargé. Vérifie ta connexion puis recharge la page."; }
   render();
+  if(S.loaded && !meM()) openWhoAmI();
 }
 
 /* ================== Démarrage ================== */
