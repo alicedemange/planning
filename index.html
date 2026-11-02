@@ -1072,7 +1072,14 @@ function renderLogin(msg){
     const {error} = await S.sb.auth.signInWithPassword({email: CFG.TEAM_EMAIL || "equipe@chamania.local", password: inp.value});
     busy = false;
     if(error){
-      const m = /invalid/i.test(error.message) ? "Code incorrect, réessaie." : /rate|many/i.test(error.message) ? "Trop d'essais : patiente quelques minutes." : "Connexion impossible : " + error.message;
+      const msg = String(error.message||"");
+      const m = /invalid login credentials/i.test(msg) ? "Code incorrect, réessaie."
+        : /api key|apikey|jwt|no api key/i.test(msg) ? "La clé Supabase dans config.js n'est pas bonne (" + msg + ")."
+        : /email not confirmed/i.test(msg) ? "Le compte d'équipe n'est pas confirmé : relance le script code-pin.sql."
+        : /email logins are disabled|provider/i.test(msg) ? "La connexion par e-mail est désactivée dans Supabase (Authentication › Sign In / Providers › Email)."
+        : /rate|many/i.test(msg) ? "Trop d'essais : patiente quelques minutes."
+        : /fetch|network|load failed/i.test(msg) ? "Impossible de joindre Supabase : vérifie l'adresse SUPABASE_URL dans config.js (" + msg + ")."
+        : "Connexion impossible : " + msg;
       renderLogin(m); document.querySelector(".pin-dots")?.classList.add("shake");
     }
   };
