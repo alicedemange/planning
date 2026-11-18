@@ -420,6 +420,12 @@ body.logged-out header.top, body.logged-out nav.tabs, body.logged-out #summary, 
   .todo-ico{grid-area:ico}.todo-b{grid-area:b}.todo-act{grid-area:act;justify-content:flex-start}.todo-thumb{display:none}
   .day .evt{display:none}
 }
+.se-step{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--paper);display:flex;flex-direction:column;gap:8px}
+.se-media{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.se-media .t{position:relative;width:64px;height:80px;border-radius:8px;overflow:hidden;background:var(--rose-wash)}
+.se-media .t img,.se-media .t video{width:100%;height:100%;object-fit:cover}
+.se-media .t button{position:absolute;top:2px;right:2px;width:22px;height:22px;border-radius:50%;border:0;background:rgba(0,0,0,.65);color:#fff}
+[hidden]{display:none!important}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -568,13 +574,14 @@ const pending = {};
 function refreshSoon(what){
   clearTimeout(pending[what]);
   pending[what] = setTimeout(async () => {
-    try{ await ({posts:loadPosts, team:loadTeam, comments:loadComments, notifs:loadNotifs, extras:loadExtras})[what](); render(); }catch(e){ console.error(e); }
+    try{ await ({posts:loadPosts, team:loadTeam, comments:loadComments, notifs:loadNotifs, extras:loadExtras, series:loadSeries})[what](); render(); if(what==="extras"||what==="series") generateSeries(); }catch(e){ console.error(e); }
   }, 250);
 }
 async function loadAll(){
   await Promise.all([loadPosts(), loadTeam(), loadComments()]);
   await loadNotifs().catch(e => { console.error(e); S.notifs = []; });
   await loadExtras().catch(e => { console.error(e); S.v3missing = true; });
+  await loadSeries().catch(() => { S.v4missing = true; });
   S.loaded = true; S.error = null;
 }
 let channel = null;
@@ -588,6 +595,7 @@ function subscribe(){
     .on("postgres_changes", {event:"*", schema:"public", table:"reglages"}, () => refreshSoon("extras"))
     .on("postgres_changes", {event:"*", schema:"public", table:"evenements"}, () => refreshSoon("extras"))
     .on("postgres_changes", {event:"*", schema:"public", table:"favoris"}, () => refreshSoon("extras"))
+    .on("postgres_changes", {event:"*", schema:"public", table:"series"}, () => refreshSoon("series"))
     .subscribe();
 }
 document.addEventListener("visibilitychange", () => { if(!document.hidden && S.session){ refreshSoon("posts"); refreshSoon("comments"); refreshSoon("notifs"); } });
@@ -656,7 +664,7 @@ function render(){
   main.innerHTML = html;
   if(S.openDetailId && !$("#ov1").hidden && $("#ov1").dataset.kind==="detail") openDetail(S.openDetailId, true);
 }
-setInterval(() => { if(S.loaded && $("#ov1").dataset.kind!=="editor" && !document.hidden) render(); }, 60000);
+setInterval(() => { if(S.loaded && $("#ov1").dataset.kind!=="editor" && !document.hidden){ render(); generateSeries(); } }, 60000);
 function renderMe(){
   const m = meM(), b = $("#me-btn");
   b.innerHTML = m ? `${avatarHTML(m.id)}<span>${esc(m.name)}</span>` : `<span class="avatar empty">?</span><span>Qui es-tu ?</span>`;
@@ -765,7 +773,8 @@ function renderCalendar(){
   }
   const dayPosts = (byDay[S.selDay]||[]);
   S._dayEvents = eventsOn(S.selDay);
-  const evRows = S._dayEvents.map((e,i) => { const done = postForEvent(e.key); return `<div class="evrow"><div><b>🎉 ${esc(e.titre)}</b><small>${esc(e.note||"")}</small></div>${done?`<button class="btn small ghost" type="button" data-open="${done.id}">Voir le post</button>`:`<button class="btn small turq" type="button" data-action="prep-event" data-i="${i}">Préparer un post</button>`}</div>`; }).join("");
+  const evRows = S._dayEvents.map((e,i) => { const done = postForEvent(e.key); const nSt = e.id ? S.posts.filter(p => p.event_id===e.id && p.serie_key).length : 0;
+    return `<div class="evrow"><div><b>🎉 ${esc(e.titre)}</b><small>${esc(e.note||"")}${nSt?` · 📱 ${nSt} stories prévues`:""}</small></div>${e.id?`<button class="btn small ghost" type="button" data-action="edit-event" data-id="${esc(e.id)}">Modifier</button>`:""}${done?`<button class="btn small ghost" type="button" data-open="${done.id}">Voir le post</button>`:`<button class="btn small turq" type="button" data-action="prep-event" data-i="${i}">Préparer un post</button>`}</div>`; }).join("");
   const panel = `<section class="daypanel"><div class="dayp-h"><h3>${esc(fmtLong(S.selDay))}</h3><button class="btn small ghost" type="button" data-action="add-event" data-day="${S.selDay}">+ Date de l'asso</button><button class="btn small primary" type="button" data-action="new" data-day="${S.selDay}">+ Post ce jour-là</button></div>
     ${evRows}${dayPosts.length ? dayPosts.map(miniHTML).join("") : `<p class="hint">Aucun post prévu ce jour-là.</p>`}</section>`;
   const undated = S.posts.filter(p => !p.date && effStatus(p)!=="publie" && matchesPf(p));
@@ -860,6 +869,7 @@ function openOv(n, html, kind){ const o=$("#ov"+n); o.innerHTML=html; o.hidden=f
 function closeOv(n){
   const o=$("#ov"+n);
   if(n===1 && o.dataset.kind==="editor") cancelEditor();
+  if(n===1 && o.dataset.kind==="serie" && SE){ removeFiles(SE.uploaded).catch(()=>{}); SE = null; }
   o.hidden=true; o.innerHTML=""; o.dataset.kind="";
   if(n===1) S.openDetailId=null;
   if($("#ov1").hidden && $("#ov2").hidden) document.body.style.overflow="";
@@ -903,6 +913,7 @@ function openDetail(id, refresh){
       <dl class="kv"><dt>Quand</dt><dd><b>${esc(p.date?fmtLong(p.date):"Pas encore de date")}${p.time?" à "+fmtTime(p.time):""}</b></dd>
         <dt>Où</dt><dd>${pfs.map(k=>`${pfIcon(k)} ${PF[k].label}`).join(" &nbsp; ")||"À choisir"}</dd>
         ${creator?`<dt>Créé par</dt><dd>${esc(creator.name)}</dd>`:""}
+        ${p.serie_id && serie(p.serie_id)?`<dt>Série</dt><dd>📱 ${esc(serie(p.serie_id).nom)} <small class="hint">(créée automatiquement)</small></dd>`:""}
         ${(validator||p.validated_name) && ["pret","programme","publie"].includes(s)?`<dt>Feu vert</dt><dd>✓ ${esc(p.validated_name || validator.name)}${p.validated_at?", le "+esc(fmtStamp(p.validated_at)):""}</dd>`:""}</dl>
       <div class="roles">${ROLES.map(r => `<label>${r.ico} ${esc(r.who)}${roleSelect(p, r)}</label>`).join("")}</div>
       ${stepperHTML(p)}
@@ -1052,7 +1063,7 @@ async function saveEditor(){
   if(res.error){ toast(failMsg(res.error)); const b=$("#f-save"); if(b) b.disabled=false; return; }
   if(!id) id = res.data.id;
   // Supprime du stockage les visuels retirés du post
-  if(old){ const keep = new Set(ED.media.map(m=>m.path)); removeFiles(media(old).map(m=>m.path).filter(pth=>!keep.has(pth))).catch(()=>{}); }
+  if(old){ const keep = new Set(ED.media.map(m=>m.path)); removeFiles(unusedPaths(media(old).map(m=>m.path).filter(pth=>!keep.has(pth)), old.id)).catch(()=>{}); }
   const removedNew = ED.uploaded.filter(pth => !ED.media.some(m=>m.path===pth));
   removeFiles(removedNew).catch(()=>{});
   ED.saved = true;
@@ -1389,6 +1400,7 @@ function suggestions(){
   // 1. Marronnier dans les 3 semaines
   eventsBetween(t, addDays(t,21)).forEach(e => {
     if(postForEvent(e.key)) return;
+    if(e.id && S.posts.some(p => p.event_id===e.id && p.serie_key)) return; // déjà couvert par une série de stories
     const days = Math.round((parseD(e.date)-parseD(t))/864e5);
     out.push({ico:"🎉", titre:e.titre, txt:`${days===0?"Aujourd'hui":days===1?"Demain":"Dans "+days+" jours"} (${fmtShort(e.date)}). ${e.note}`, tpl:e.tpl, date:e.date, event_key:e.key, label:e.titre});
     used.add(e.tpl);
@@ -1575,7 +1587,7 @@ function todoRowHTML(it){
 function openSettings(){
   closeOv(2);
   const r = S.reglages || {};
-  const evs = (S.events||[]).map(e => `<div class="teamrow"><span style="flex:1"><b>${esc(e.titre)}</b> <small class="hint">${esc(fmtShort(String(e.date).slice(0,10)))}${e.recurrent?" · chaque année":""}</small></span><button class="x" type="button" data-del-ev="${esc(e.id)}" aria-label="Supprimer">×</button></div>`).join("");
+  const evs = (S.events||[]).map(e => `<div class="teamrow"><span style="flex:1"><b>${esc(e.titre)}</b> <small class="hint">${esc(fmtShort(String(e.date).slice(0,10)))}${e.recurrent?" · chaque année":""}${(e.serie_ids||[]).length?" · 📱 "+esc((e.serie_ids||[]).map(id=>serie(id)?.nom).filter(Boolean).join(", ")):""}</small></span><button class="btn small" type="button" data-edit-ev="${esc(e.id)}">Modifier</button></div>`).join("");
   const favs = (S.favoris||[]).map(f => `<div class="teamrow"><span style="flex:1"><b>${esc(f.label)}</b> <small class="hint">${f.kind==="hashtags"?"hashtags":"texte"}</small><br><small>${esc(f.contenu.slice(0,90))}${f.contenu.length>90?"…":""}</small></span><button class="x" type="button" data-del-fav="${esc(f.id)}" aria-label="Supprimer">×</button></div>`).join("");
   openOv(1, `<div class="modal narrow" role="dialog" aria-modal="true" aria-labelledby="st-t"><div class="m-head"><h2 id="st-t">Réglages</h2><button class="x" type="button" data-action="close1" aria-label="Fermer">×</button></div>
     <div class="m-body">
@@ -1586,6 +1598,7 @@ function openSettings(){
       <button class="btn primary" type="button" id="st-save" style="align-self:flex-start">Enregistrer les réglages</button>
       <div class="sec"><h4>Textes et hashtags favoris</h4><div style="display:flex;flex-direction:column;gap:8px">${favs||`<p class="hint" style="margin:0">Aucun favori.</p>`}</div>
         <form id="fav-add" style="display:grid;gap:8px;margin-top:10px"><div class="row2"><input class="inp" id="fav-label" placeholder="Nom (ex. Lien HelloAsso)" required><select class="inp" id="fav-kind"><option value="texte">Texte</option><option value="hashtags">Hashtags</option></select></div><textarea class="inp" id="fav-txt" placeholder="Le texte ou les hashtags à insérer" required style="min-height:70px"></textarea><button class="btn small" type="submit" style="justify-self:start">+ Ajouter le favori</button></form></div>
+      ${seriesSectionHTML()}
       <div class="sec"><h4>Dates de l'asso</h4><p class="hint" style="margin:0 0 8px">Journées d'adoption, AG, brocantes… Elles s'affichent dans le calendrier et l'appli propose un post 3 semaines avant.</p><div style="display:flex;flex-direction:column;gap:8px">${evs||""}</div>
         <button class="btn small" type="button" id="ev-add-btn" style="margin-top:8px">+ Ajouter une date</button></div>
     </div></div>`, "settings");
@@ -1599,19 +1612,47 @@ function openSettings(){
     const ok = await run(S.sb.from("favoris").insert({label:$("#fav-label").value.trim(), kind:$("#fav-kind").value, contenu:$("#fav-txt").value.trim()}), "Favori ajouté.");
     if(ok){ await loadExtras().catch(()=>{}); openSettings(); } };
   $("#ov1").querySelectorAll("[data-del-fav]").forEach(b => b.onclick = async () => { if(await run(S.sb.from("favoris").delete().eq("id", b.dataset.delFav))){ await loadExtras().catch(()=>{}); openSettings(); } });
-  $("#ov1").querySelectorAll("[data-del-ev]").forEach(b => b.onclick = async () => { if(await run(S.sb.from("evenements").delete().eq("id", b.dataset.delEv))){ await loadExtras().catch(()=>{}); openSettings(); render(); } });
+  $("#ov1").querySelectorAll("[data-edit-ev]").forEach(b => b.onclick = () => openEventForm(today(), openSettings, b.dataset.editEv));
   $("#ev-add-btn").onclick = () => openEventForm(today(), openSettings);
 }
-function openEventForm(ds, after){
-  openOv(2, `<form class="modal narrow" role="dialog" aria-modal="true" aria-labelledby="ev-t" id="ev-form"><div class="m-head"><h2 id="ev-t">Ajouter une date de l'asso</h2><button class="x" type="button" data-action="close2" aria-label="Fermer">×</button></div>
-    <div class="m-body"><label class="f">Quoi ?<input class="inp" id="ev-titre" placeholder="Ex. Journée d'adoption à Villefranche" required autofocus></label>
-      <label class="f">Date<input class="inp" type="date" id="ev-date" value="${esc(ds)}" required></label>
-      <label class="toggle"><input type="checkbox" id="ev-rec"> Revient chaque année à la même date</label>
-      <label class="f">Note <span class="h">Facultatif : idée de post, infos utiles…</span><input class="inp" id="ev-note"></label></div>
-    <div class="m-foot"><span class="spacer"></span><button class="btn" type="button" data-action="close2">Annuler</button><button class="btn primary" type="submit">Ajouter</button></div></form>`);
+function openEventForm(ds, after, evId){
+  const ex = evId ? (S.events||[]).find(e => e.id===evId) : null;
+  const evs = eventSeries();
+  const auto = t => /\bJA\b|adoption/i.test(t||"");
+  openOv(2, `<form class="modal narrow" role="dialog" aria-modal="true" aria-labelledby="ev-t" id="ev-form"><div class="m-head"><h2 id="ev-t">${ex?"Modifier la date":"Ajouter une date de l'asso"}</h2><button class="x" type="button" data-action="close2" aria-label="Fermer">×</button></div>
+    <div class="m-body"><label class="f">Quoi ?<input class="inp" id="ev-titre" value="${esc(ex?.titre||"")}" placeholder="Ex. Journée d'adoption à Villefranche" required autofocus></label>
+      <label class="f">Date<input class="inp" type="date" id="ev-date" value="${esc(ex ? String(ex.date).slice(0,10) : ds)}" required></label>
+      <label class="toggle"><input type="checkbox" id="ev-rec" ${ex?.recurrent?"checked":""}> Revient chaque année à la même date</label>
+      <label class="f">Note <span class="h">Facultatif : lieu, horaires, infos utiles…</span><input class="inp" id="ev-note" value="${esc(ex?.note||"")}"></label>
+      ${evs.length ? `<div class="sec"><h4>📱 Créer les stories automatiquement</h4><div style="display:flex;flex-direction:column;gap:6px">${evs.map(s => `<label class="toggle" style="color:var(--ink)"><input type="checkbox" name="ev-serie" value="${esc(s.id)}" ${(ex ? (ex.serie_ids||[]).includes(s.id) : false)?"checked":""} data-auto="${ex?"":"1"}"> ${esc(s.nom)} <small class="hint">(${esc((s.etapes||[]).map(st => offsetLabel(st.offset)).join(", "))})</small></label>`).join("")}</div></div>` : ""}
+    </div>
+    <div class="m-foot">${ex?`<button class="btn ghost danger" type="button" id="ev-del">Supprimer</button>`:""}<span class="spacer"></span><button class="btn" type="button" data-action="close2">Annuler</button><button class="btn primary" type="submit">${ex?"Enregistrer":"Ajouter"}</button></div></form>`);
+  // Pré-coche la série JA quand le nom parle d'adoption
+  const syncAuto = () => document.querySelectorAll('input[name=ev-serie][data-auto="1"]').forEach(c => { const s = serie(c.value); c.checked = auto($("#ev-titre").value) && /JA|adoption/i.test(s?.nom||""); });
+  if(!ex){ $("#ev-titre").addEventListener("input", syncAuto); document.querySelectorAll('input[name=ev-serie]').forEach(c => c.addEventListener("change", () => c.dataset.auto = "")); }
   $("#ev-form").onsubmit = async e => { e.preventDefault();
-    const ok = await run(S.sb.from("evenements").insert({titre:$("#ev-titre").value.trim(), date:$("#ev-date").value, recurrent:$("#ev-rec").checked, note:$("#ev-note").value.trim()}), "Date ajoutée au calendrier.");
-    if(ok){ closeOv(2); await loadExtras().catch(()=>{}); render(); after && after(); } };
+    const ids = [...document.querySelectorAll("input[name=ev-serie]:checked")].map(c => c.value);
+    const data = {titre:$("#ev-titre").value.trim(), date:$("#ev-date").value, recurrent:$("#ev-rec").checked, note:$("#ev-note").value.trim()};
+    if(!S.v4missing) data.serie_ids = ids;
+    const ok = await run(ex ? S.sb.from("evenements").update(data).eq("id", ex.id) : S.sb.from("evenements").insert(data), ex ? "Date modifiée." : "Date ajoutée au calendrier.");
+    if(!ok) return;
+    if(ex){ // séries décochées : on retire leurs stories à venir
+      const removed = (ex.serie_ids||[]).filter(id => !ids.includes(id));
+      for(const p of seriesPostsOf(p => p.event_id===ex.id && removed.includes(p.serie_id))) await S.sb.from("posts").delete().eq("id", p.id);
+    }
+    closeOv(2); await loadExtras().catch(()=>{}); await loadPosts().catch(()=>{});
+    await generateSeries(true); render();
+    const n = seriesPostsOf(p => p.event_id && (ex ? p.event_id===ex.id : true)).length;
+    if(ids.length) toast(`Les stories sont dans le planning (${n} à venir).`);
+    after && after();
+  };
+  const del = $("#ev-del"); if(del) del.onclick = () => {
+    const posts = seriesPostsOf(p => p.event_id===ex.id);
+    confirmBox("Supprimer cette date ?", posts.length ? `Les ${posts.length} stories prévues pour cet événement seront aussi supprimées.` : `« ${ex.titre} » sera retiré du calendrier.`, "Supprimer", async () => {
+      for(const p of posts) await S.sb.from("posts").delete().eq("id", p.id);
+      if(await run(S.sb.from("evenements").delete().eq("id", ex.id), "Date supprimée.")){ await loadExtras().catch(()=>{}); await loadPosts().catch(()=>{}); render(); after && after(); }
+    });
+  };
 }
 
 /* ---- Favoris dans l'éditeur ---- */
@@ -1625,6 +1666,228 @@ function insertFav(id, target){
   if(target==="#f-hashtags"){ const cur = el.value.split(/\s+/).filter(Boolean); f.contenu.split(/\s+/).forEach(h => { if(h && !cur.includes(h)) cur.push(h); }); el.value = cur.join(" "); }
   else { const pos = el.selectionStart ?? el.value.length; const before = el.value.slice(0,pos), after = el.value.slice(pos); const sep = before && !before.endsWith("\n") ? "\n\n" : ""; el.value = before + sep + f.contenu + after; }
   el.dispatchEvent(new Event("input")); el.focus();
+}
+
+/* ================== V4 : séries de stories ================== */
+const KINDS = {evenement:"Avant / pendant un événement", hebdo:"Chaque semaine", mensuel:"Chaque mois"};
+const JOURS_SEM = ["lundi","mardi","mercredi","jeudi","vendredi","samedi","dimanche"];
+async function loadSeries(){
+  const {data, error} = await S.sb.from("series").select("*").order("created_at");
+  if(error){ S.series = []; S.v4missing = true; return; }
+  S.v4missing = false; S.series = data || [];
+}
+const serie = id => (S.series||[]).find(s => s.id===id);
+const eventSeries = () => (S.series||[]).filter(s => s.kind==="evenement");
+const offsetLabel = n => +n===0 ? "le jour J" : +n>0 ? `J-${n}` : `J+${-n}`;
+
+// Visuels partagés (séries, posts copiés) : on ne supprime un fichier que s'il ne sert plus nulle part
+function unusedPaths(paths, ignorePostId){
+  const used = new Set();
+  S.posts.forEach(p => { if(p.id!==ignorePostId) media(p).forEach(m => used.add(m.path)); });
+  (S.series||[]).forEach(s => (s.etapes||[]).forEach(st => (st.media||[]).forEach(m => used.add(m.path))));
+  return paths.filter(p => p && !used.has(p));
+}
+
+// Prochaine occurrence d'une date de l'asso (les dates annuelles repartent l'année suivante)
+function nextOccurrence(ev, t){
+  const d = String(ev.date).slice(0,10);
+  if(!ev.recurrent) return d >= addDays(t,-1) ? d : null;
+  let occ = `${t.slice(0,4)}${d.slice(4)}`;
+  if(occ < addDays(t,-1)) occ = `${+t.slice(0,4)+1}${d.slice(4)}`;
+  return occ;
+}
+function fillTpl(str, ev, occ){ return String(str||"").replaceAll("{evenement}", ev?.titre||"").replaceAll("{date}", occ ? fmtLong(occ) : ""); }
+function buildSeriePost(s, st, i, date, key, ev, occ){
+  const now = new Date().toISOString();
+  return {
+    title: `${st.titre || s.nom}${ev ? " · " + ev.titre : ""}`,
+    status: s.validation ? "creation" : "pret",
+    rubrique: st.rubrique || (s.kind==="evenement" ? "evenement" : "vie"),
+    platforms: (s.platforms && s.platforms.length) ? s.platforms : ["instagram"],
+    format: st.format || "story",
+    date, time: st.time || null,
+    assignee: st.assignee || null,
+    wording_by: s.validation ? (st.assignee || null) : null,
+    visual_done_at: now, wording_done_at: now,
+    caption: fillTpl(st.caption, ev, occ), hashtags: "", notes: fillTpl(st.notes, ev, occ), link: "",
+    media: Array.isArray(st.media) ? st.media : [], published: {},
+    serie_id: s.id, serie_key: key, event_id: ev?.id || null,
+    validated_name: s.validation ? null : "Série validée"
+  };
+}
+let genBusy = false, genLast = 0;
+async function generateSeries(force){
+  if(genBusy || S.v4missing || !(S.series||[]).length || !S.loaded) return;
+  if(!force && Date.now() - genLast < 60000) return;
+  genBusy = true; genLast = Date.now();
+  try{
+    const t = today(), horizon = addDays(t, 28), rows = [], moves = [];
+    const byKey = new Map(S.posts.filter(p => p.serie_key).map(p => [p.serie_key, p]));
+    for(const s of S.series.filter(x => x.active !== false)){
+      const steps = Array.isArray(s.etapes) ? s.etapes : [];
+      if(s.kind === "evenement"){
+        for(const ev of (S.events||[]).filter(e => (e.serie_ids||[]).includes(s.id))){
+          const occ = nextOccurrence(ev, t); if(!occ) continue;
+          steps.forEach((st, i) => {
+            const date = addDays(occ, -(+st.offset || 0));
+            const key = `s:${s.id}:e:${ev.id}:${occ.slice(0,4)}:${i}`;
+            const ex = byKey.get(key);
+            if(ex){ if(ex.date !== date && !["publie","programme"].includes(effStatus(ex))) moves.push({id:ex.id, date}); return; }
+            if(date >= t) rows.push(buildSeriePost(s, st, i, date, key, ev, occ));
+          });
+        }
+      } else {
+        const st = steps[0]; if(!st || !s.jour) continue;
+        for(let d = t; d <= horizon; d = addDays(d, 1)){
+          const dt = parseD(d);
+          const ok = s.kind === "hebdo" ? ((dt.getDay()+6)%7 + 1) === +s.jour : dt.getDate() === +s.jour;
+          if(!ok) continue;
+          const key = `s:${s.id}:${d}`;
+          if(!byKey.has(key)) rows.push(buildSeriePost(s, st, 0, d, key, null, null));
+        }
+      }
+    }
+    if(rows.length){ const {error} = await S.sb.from("posts").upsert(rows, {onConflict:"serie_key", ignoreDuplicates:true}); if(error) console.error(error); }
+    for(const m of moves) await S.sb.from("posts").update({date:m.date, reminder_sent_at:null}).eq("id", m.id);
+    if(rows.length || moves.length){ await loadPosts(); render(); }
+  }catch(e){ console.error(e); }
+  finally{ genBusy = false; }
+}
+const seriesPostsOf = (pred) => S.posts.filter(p => p.serie_key && pred(p) && !["publie","programme"].includes(effStatus(p)) && p.date >= today());
+
+/* ---- Éditeur de série ---- */
+let SE = null;
+function openSerieEditor(id){
+  closeOv(2);
+  const s = id ? serie(id) : {nom:"", kind:"evenement", jour:1, platforms:["instagram"], validation:false, active:true, etapes:[{offset:1, time:"18:00", titre:"", caption:"", notes:"", assignee:"", media:[]}]};
+  SE = {id: id||null, kind: s.kind, etapes: JSON.parse(JSON.stringify(s.etapes||[])), uploaded: []};
+  if(SE.kind!=="evenement" && !SE.etapes.length) SE.etapes = [{time:"10:00", titre:"", caption:"", notes:"", assignee:"", media:[]}];
+  openOv(1, `<form class="modal" role="dialog" aria-modal="true" aria-labelledby="se-t" id="se-form">
+    <div class="m-head"><h2 id="se-t">${id ? "Modifier la série" : "Nouvelle série de stories"}</h2><button class="x" type="button" data-action="close1" aria-label="Fermer">×</button></div>
+    <div class="m-body">
+      <label class="f">Nom de la série<input class="inp" id="se-nom" value="${esc(s.nom)}" placeholder="Ex. Compte à rebours JA, Chat de la semaine…" required autofocus></label>
+      <div class="row3">
+        <label class="f">Quand ?<select class="inp" id="se-kind">${Object.entries(KINDS).map(([k,l]) => `<option value="${k}" ${s.kind===k?"selected":""}>${l}</option>`).join("")}</select></label>
+        <label class="f" id="se-jour-w" ${s.kind==="evenement"?"hidden":""}><span id="se-jour-l">${s.kind==="mensuel"?"Jour du mois":"Jour de la semaine"}</span><select class="inp" id="se-jour"></select></label>
+        <div class="sec"><h4>Réseaux</h4><div class="chips">${Object.keys(PF).map(k => `<label class="chip"><input type="checkbox" name="se-pf" value="${k}" ${(s.platforms||[]).includes(k)?"checked":""}><span>${pfIcon(k)}${PF[k].label}</span></label>`).join("")}</div></div>
+      </div>
+      <label class="toggle"><input type="checkbox" id="se-val" ${s.validation?"checked":""}> Faire valider chaque story (sinon elles arrivent directement en « Prêt à poster »)</label>
+      <label class="toggle"><input type="checkbox" id="se-active" ${s.active!==false?"checked":""}> Série active</label>
+      <div class="sec"><h4 id="se-steps-h">Les stories</h4><p class="hint" style="margin:0 0 8px" id="se-steps-hint"></p><div id="se-steps" style="display:flex;flex-direction:column;gap:10px"></div>
+        <button class="btn small" type="button" id="se-add" style="margin-top:8px">+ Ajouter une story</button></div>
+    </div>
+    <div class="m-foot">${id ? `<button class="btn ghost danger" type="button" id="se-del">Supprimer la série</button>` : ""}<span class="spacer"></span><button class="btn" type="button" data-action="close1">Annuler</button><button class="btn primary" type="submit" id="se-save">Enregistrer</button></div>
+  </form>`, "serie");
+  const fillJour = kind => {
+    $("#se-jour").innerHTML = kind==="mensuel"
+      ? Array.from({length:28}, (_,i) => `<option value="${i+1}" ${+s.jour===i+1?"selected":""}>le ${i+1}</option>`).join("")
+      : JOURS_SEM.map((j,i) => `<option value="${i+1}" ${+s.jour===i+1?"selected":""}>${j}</option>`).join("");
+    $("#se-jour-l").textContent = kind==="mensuel" ? "Jour du mois" : "Jour de la semaine";
+    $("#se-jour-w").hidden = kind==="evenement";
+    $("#se-add").hidden = kind!=="evenement";
+    $("#se-steps-hint").textContent = kind==="evenement"
+      ? "Les stories sont créées automatiquement quand une date de l'asso utilise cette série. Dans les textes, {evenement} et {date} sont remplacés par le nom et la date de l'événement."
+      : "Une story est créée automatiquement chaque " + (kind==="mensuel"?"mois":"semaine") + ", 4 semaines à l'avance.";
+  };
+  fillJour(s.kind);
+  $("#se-kind").onchange = e => { SE.kind = e.target.value; if(SE.kind!=="evenement") SE.etapes = SE.etapes.slice(0,1); fillJour(SE.kind); drawSteps(); };
+  $("#se-add").onclick = () => { readSteps(); SE.etapes.push({offset:0, time:"18:00", titre:"", caption:"", notes:"", assignee:"", media:[]}); drawSteps(); };
+  $("#se-form").onsubmit = e => { e.preventDefault(); saveSerie(); };
+  const del = $("#se-del"); if(del) del.onclick = () => deleteSerie(id);
+  drawSteps();
+}
+function readSteps(){
+  document.querySelectorAll("#se-steps .se-step").forEach((el, i) => {
+    const st = SE.etapes[i]; if(!st) return;
+    const q = c => el.querySelector(c);
+    if(q(".s-off")) st.offset = +q(".s-off").value || 0;
+    st.time = q(".s-time").value; st.titre = q(".s-titre").value.trim(); st.caption = q(".s-cap").value; st.notes = q(".s-notes").value; st.assignee = q(".s-who").value;
+  });
+}
+function drawSteps(){
+  const ev = SE.kind === "evenement";
+  if(ev) SE.etapes.sort((a,b) => (+b.offset||0) - (+a.offset||0));
+  $("#se-steps").innerHTML = SE.etapes.map((st, i) => `<div class="se-step">
+    <div class="row3">
+      ${ev ? `<label class="f">Combien de jours avant ?<input class="inp s-off" type="number" min="-30" max="90" value="${esc(st.offset??0)}"><span class="h">0 = le jour J</span></label>` : ""}
+      <label class="f">Heure<input class="inp s-time" type="time" value="${esc(st.time||"")}"></label>
+      <label class="f">Nom de la story<input class="inp s-titre" value="${esc(st.titre||"")}" placeholder="Ex. Save the date"></label>
+      ${ev ? "" : `<span></span>`}
+    </div>
+    <label class="f">Texte / sticker<textarea class="inp s-cap" style="min-height:70px">${esc(st.caption||"")}</textarea></label>
+    <div class="row2"><label class="f">Consignes<input class="inp s-notes" value="${esc(st.notes||"")}" placeholder="Ex. sticker compte à rebours + lieu"></label>
+      <label class="f">Qui poste ?<select class="inp s-who"><option value="">À répartir</option>${S.team.map(m => `<option value="${esc(m.id)}" ${m.id===st.assignee?"selected":""}>${esc(m.name)}</option>`).join("")}</select></label></div>
+    <div class="se-media">${(st.media||[]).map((m,j) => `<div class="t">${mediaHTML(m)}<button type="button" data-rm-sm="${i}:${j}" aria-label="Retirer">×</button></div>`).join("")}
+      <label class="btn small" for="s-file-${i}">+ Visuel réutilisable</label><input class="sr" type="file" id="s-file-${i}" data-step="${i}" accept="image/*,video/mp4,video/webm,video/quicktime"></div>
+    ${ev && SE.etapes.length>1 ? `<button class="linkbtn" type="button" data-rm-step="${i}">Retirer cette story</button>` : ""}
+  </div>`).join("");
+  $("#se-steps").querySelectorAll("[data-rm-step]").forEach(b => b.onclick = () => { readSteps(); SE.etapes.splice(+b.dataset.rmStep, 1); drawSteps(); });
+  $("#se-steps").querySelectorAll("[data-rm-sm]").forEach(b => b.onclick = () => { readSteps(); const [i,j] = b.dataset.rmSm.split(":").map(Number); SE.etapes[i].media.splice(j,1); drawSteps(); });
+  $("#se-steps").querySelectorAll("input[type=file]").forEach(inp => inp.onchange = async () => {
+    const f = inp.files[0]; if(!f) return; readSteps();
+    const i = +inp.dataset.step; inp.disabled = true;
+    try{
+      const isVideo = f.type.startsWith("video/");
+      if(isVideo && f.size > VIDEO_MAX) throw new Error("Vidéo trop lourde (50 Mo max)");
+      const file = isVideo ? f : await compressImage(f);
+      const ext = ({"image/jpeg":"jpg","image/png":"png","image/webp":"webp","image/gif":"gif","video/mp4":"mp4","video/webm":"webm","video/quicktime":"mov"})[file.type] || "bin";
+      const path = `series/${crypto.randomUUID()}.${ext}`;
+      const {error} = await S.sb.storage.from(BUCKET).upload(path, file, {contentType:file.type, cacheControl:"31536000"});
+      if(error) throw error;
+      (SE.etapes[i].media = SE.etapes[i].media || []).push({path, type:isVideo?"video":"image"}); SE.uploaded.push(path);
+    }catch(e){ toast(e.message && !e.statusCode ? e.message : failMsg(e)); }
+    drawSteps();
+  });
+}
+async function saveSerie(){
+  readSteps();
+  const nom = $("#se-nom").value.trim(); if(!nom){ $("#se-nom").focus(); return; }
+  const data = {nom, kind:SE.kind, jour: SE.kind==="evenement" ? null : +$("#se-jour").value,
+    platforms:[...document.querySelectorAll("input[name=se-pf]:checked")].map(i=>i.value),
+    validation:$("#se-val").checked, active:$("#se-active").checked,
+    etapes: SE.etapes.map(st => ({offset:+st.offset||0, time:st.time||null, titre:st.titre||"", caption:st.caption||"", notes:st.notes||"", assignee:st.assignee||"", media:st.media||[]}))};
+  if(!data.platforms.length) data.platforms = ["instagram"];
+  $("#se-save").disabled = true;
+  const res = SE.id ? await S.sb.from("series").update(data).eq("id", SE.id) : await S.sb.from("series").insert(data).select("id").single();
+  if(res.error){ toast(failMsg(res.error)); $("#se-save").disabled = false; return; }
+  const sid = SE.id || res.data.id, wasEdit = !!SE.id;
+  SE = null; await loadSeries(); closeOv(1);
+  const upcoming = seriesPostsOf(p => p.serie_id===sid);
+  if(wasEdit && upcoming.length){
+    confirmBox("Mettre à jour les stories déjà prévues ?", `${upcoming.length} stories de cette série sont déjà dans le planning. Leur appliquer les nouveaux textes, consignes, heures, visuels et personnes ?`, "Oui, mettre à jour", async () => {
+      const s = serie(sid);
+      for(const p of upcoming){
+        const parts = p.serie_key.split(":"), i = +parts[parts.length-1], st = s.kind==="evenement" ? s.etapes[i] : s.etapes[0];
+        if(!st) continue;
+        const ev = (S.events||[]).find(e => e.id===p.event_id), occ = ev ? nextOccurrence(ev, today()) : null;
+        const b = buildSeriePost(s, st, i, p.date, p.serie_key, ev, occ);
+        await S.sb.from("posts").update({title:b.title, time:b.time, caption:b.caption, notes:b.notes, media:b.media, assignee:b.assignee, platforms:b.platforms}).eq("id", p.id);
+      }
+      await loadPosts(); render(); toast("Stories à venir mises à jour.");
+    });
+  }
+  toast("Série enregistrée.");
+  await generateSeries(true); render();
+}
+function deleteSerie(id){
+  const n = seriesPostsOf(p => p.serie_id===id).length;
+  confirmBox("Supprimer cette série ?", n ? `Les ${n} stories à venir de cette série seront aussi supprimées (celles déjà publiées sont gardées).` : "Elle ne créera plus de stories.", "Supprimer", async () => {
+    const posts = seriesPostsOf(p => p.serie_id===id);
+    for(const p of posts) await S.sb.from("posts").delete().eq("id", p.id);
+    const {error} = await S.sb.from("series").delete().eq("id", id);
+    if(error){ toast(failMsg(error)); return; }
+    SE = null; closeOv(1); await Promise.all([loadSeries(), loadPosts()]); render(); toast("Série supprimée.");
+  });
+}
+function seriesSectionHTML(){
+  if(S.v4missing) return `<div class="sec"><h4>Séries de stories</h4><div class="valbox warn"><p>Lance <b>mise-a-jour-v4-series.sql</b> dans Supabase pour activer les séries de stories.</p></div></div>`;
+  const rows = (S.series||[]).map(s => {
+    const desc = s.kind==="evenement" ? (s.etapes||[]).map(st => offsetLabel(st.offset)).join(" · ") : s.kind==="hebdo" ? `chaque ${JOURS_SEM[(s.jour||1)-1]}` : `le ${s.jour} de chaque mois`;
+    return `<div class="teamrow"><span style="flex:1"><b>${esc(s.nom)}</b>${s.active===false?` <small class="hint">(en pause)</small>`:""}<br><small class="hint">${esc(KINDS[s.kind])} · ${esc(desc)}</small></span><button class="btn small" type="button" data-action="edit-serie" data-id="${esc(s.id)}">Modifier</button></div>`;
+  }).join("");
+  return `<div class="sec"><h4>Séries de stories</h4><p class="hint" style="margin:0 0 8px">Des stories créées automatiquement : avant une journée d'adoption, chaque semaine ou chaque mois.</p>
+    <div style="display:flex;flex-direction:column;gap:8px">${rows || `<p class="hint" style="margin:0">Aucune série.</p>`}</div>
+    <button class="btn small" type="button" data-action="new-serie" style="margin-top:8px">+ Nouvelle série</button></div>`;
 }
 
 /* ================== Événements ================== */
@@ -1660,13 +1923,16 @@ document.addEventListener("click", async e => {
       case "prep-event": { const ev = (S._dayEvents||[])[+a.dataset.i]; if(ev) createFromTemplate(ev.tpl, {date:ev.date, event_key:ev.key, label:ev.titre}); break; }
       case "add-event": openEventForm(a.dataset.day || today()); break;
       case "settings": openSettings(); break;
+      case "new-serie": openSerieEditor(null); break;
+      case "edit-serie": openSerieEditor(id); break;
+      case "edit-event": openEventForm(today(), null, id); break;
       case "notifs": openNotifs(); break;
       case "edit": $("#ov1").dataset.kind=""; openEditor(id); break;
       case "duplicate": $("#ov1").dataset.kind=""; openEditor(null, null, id); break;
       case "delete": { const p=getPost(id); confirmBox("Supprimer ce post ?", `« ${p?.title||"Sans titre"} » sera supprimé pour toute l'équipe, avec ses visuels.`, "Supprimer", async () => {
           const paths = media(p||{}).map(m=>m.path);
           const ok = await run(S.sb.from("posts").delete().eq("id", id), "Post supprimé.");
-          if(ok){ removeFiles(paths).catch(()=>{}); S.posts = S.posts.filter(x=>x.id!==id); closeOv(1); render(); }
+          if(ok){ removeFiles(unusedPaths(paths, id)).catch(()=>{}); S.posts = S.posts.filter(x=>x.id!==id); closeOv(1); render(); }
         }); break; }
       case "advance":
         if(a.dataset.to==="validation"){ await sendForValidation(id); break; }
@@ -1792,6 +2058,7 @@ async function onSession(session){
   render();
   if(S.loaded && !meM()) openWhoAmI(); else if(S.loaded){ syncPush(); }
   handleHash(); openPending();
+  generateSeries(true);
 }
 
 /* ================== Démarrage ================== */
