@@ -426,6 +426,7 @@ body.logged-out header.top, body.logged-out nav.tabs, body.logged-out #summary, 
 .se-media .t img,.se-media .t video{width:100%;height:100%;object-fit:cover}
 .se-media .t button{position:absolute;top:2px;right:2px;width:22px;height:22px;border-radius:50%;border:0;background:rgba(0,0,0,.65);color:#fff}
 [hidden]{display:none!important}
+.teamrow .ev-extra{flex:1 1 auto;width:auto;min-width:0}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -1615,26 +1616,39 @@ function openSettings(){
   $("#ov1").querySelectorAll("[data-edit-ev]").forEach(b => b.onclick = () => openEventForm(today(), openSettings, b.dataset.editEv));
   $("#ev-add-btn").onclick = () => openEventForm(today(), openSettings);
 }
-function openEventForm(ds, after, evId){
+function openEventForm(ds, after, evId, copyFrom){
   const ex = evId ? (S.events||[]).find(e => e.id===evId) : null;
+  const cp = copyFrom ? (S.events||[]).find(e => e.id===copyFrom) : null;
   const evs = eventSeries();
   const auto = t => /\bJA\b|adoption/i.test(t||"");
   openOv(2, `<form class="modal narrow" role="dialog" aria-modal="true" aria-labelledby="ev-t" id="ev-form"><div class="m-head"><h2 id="ev-t">${ex?"Modifier la date":"Ajouter une date de l'asso"}</h2><button class="x" type="button" data-action="close2" aria-label="Fermer">×</button></div>
-    <div class="m-body"><label class="f">Quoi ?<input class="inp" id="ev-titre" value="${esc(ex?.titre||"")}" placeholder="Ex. Journée d'adoption à Villefranche" required autofocus></label>
-      <label class="f">Date<input class="inp" type="date" id="ev-date" value="${esc(ex ? String(ex.date).slice(0,10) : ds)}" required></label>
+    <div class="m-body"><label class="f">Quoi ?<input class="inp" id="ev-titre" value="${esc(ex?.titre||cp?.titre||"")}" placeholder="Ex. Journée d'adoption à Villefranche" required autofocus></label>
+      <label class="f">${ex?"Date":"Date(s)"}<input class="inp" type="date" id="ev-date" value="${esc(ex ? String(ex.date).slice(0,10) : ds)}" required></label>
+      ${ex ? "" : `<div id="ev-more" style="display:flex;flex-direction:column;gap:6px"></div><button class="btn small" type="button" id="ev-more-btn" style="align-self:flex-start">+ Ajouter une autre date</button><p class="hint" style="margin:0">Même lieu, plusieurs dates (ex. tous les samedis de décembre) : chaque date aura ses propres stories.</p>`}
       <label class="toggle"><input type="checkbox" id="ev-rec" ${ex?.recurrent?"checked":""}> Revient chaque année à la même date</label>
-      <label class="f">Note <span class="h">Facultatif : lieu, horaires, infos utiles…</span><input class="inp" id="ev-note" value="${esc(ex?.note||"")}"></label>
-      ${evs.length ? `<div class="sec"><h4>📱 Créer les stories automatiquement</h4><div style="display:flex;flex-direction:column;gap:6px">${evs.map(s => `<label class="toggle" style="color:var(--ink)"><input type="checkbox" name="ev-serie" value="${esc(s.id)}" ${(ex ? (ex.serie_ids||[]).includes(s.id) : false)?"checked":""} data-auto="${ex?"":"1"}"> ${esc(s.nom)} <small class="hint">(${esc((s.etapes||[]).map(st => offsetLabel(st.offset)).join(", "))})</small></label>`).join("")}</div></div>` : ""}
+      <label class="f">Note <span class="h">Facultatif : lieu, horaires, infos utiles…</span><input class="inp" id="ev-note" value="${esc(ex?.note||cp?.note||"")}"></label>
+      ${evs.length ? `<div class="sec"><h4>📱 Créer les stories automatiquement</h4><div style="display:flex;flex-direction:column;gap:6px">${evs.map(s => `<label class="toggle" style="color:var(--ink)"><input type="checkbox" name="ev-serie" value="${esc(s.id)}" ${((ex||cp) ? ((ex||cp).serie_ids||[]).includes(s.id) : false)?"checked":""} data-auto="${(ex||cp)?"":"1"}"> ${esc(s.nom)} <small class="hint">(${esc((s.etapes||[]).map(st => offsetLabel(st.offset)).join(", "))})</small></label>`).join("")}</div></div>` : ""}
     </div>
-    <div class="m-foot">${ex?`<button class="btn ghost danger" type="button" id="ev-del">Supprimer</button>`:""}<span class="spacer"></span><button class="btn" type="button" data-action="close2">Annuler</button><button class="btn primary" type="submit">${ex?"Enregistrer":"Ajouter"}</button></div></form>`);
+    <div class="m-foot">${ex?`<button class="btn ghost danger" type="button" id="ev-del">Supprimer</button><button class="btn ghost" type="button" id="ev-dup">+ Autres dates, même lieu</button>`:""}<span class="spacer"></span><button class="btn" type="button" data-action="close2">Annuler</button><button class="btn primary" type="submit">${ex?"Enregistrer":"Ajouter"}</button></div></form>`);
   // Pré-coche la série JA quand le nom parle d'adoption
   const syncAuto = () => document.querySelectorAll('input[name=ev-serie][data-auto="1"]').forEach(c => { const s = serie(c.value); c.checked = auto($("#ev-titre").value) && /JA|adoption/i.test(s?.nom||""); });
-  if(!ex){ $("#ev-titre").addEventListener("input", syncAuto); document.querySelectorAll('input[name=ev-serie]').forEach(c => c.addEventListener("change", () => c.dataset.auto = "")); }
+  const moreBtn = $("#ev-more-btn");
+  if(moreBtn) moreBtn.onclick = () => {
+    const all = [...document.querySelectorAll("#ev-date, .ev-extra")].map(i => i.value).filter(Boolean).sort();
+    const next = all.length ? addDays(all[all.length-1], 7) : today();
+    const row = document.createElement("div"); row.className = "teamrow"; row.style.flexWrap = "nowrap";
+    row.innerHTML = `<input class="inp ev-extra" type="date" style="flex-wrap:nowrap" value="${next}" aria-label="Autre date"><button class="x" type="button" aria-label="Retirer cette date">×</button>`;
+    row.querySelector("button").onclick = () => row.remove();
+    $("#ev-more").appendChild(row); row.querySelector("input").focus();
+  };
+  const dup = $("#ev-dup"); if(dup) dup.onclick = () => { closeOv(2); openEventForm(addDays(String(ex.date).slice(0,10), 7), after, null, ex.id); setTimeout(() => $("#ev-more-btn")?.click(), 50); };
+  if(!ex && !cp){ $("#ev-titre").addEventListener("input", syncAuto); document.querySelectorAll('input[name=ev-serie]').forEach(c => c.addEventListener("change", () => c.dataset.auto = "")); }
   $("#ev-form").onsubmit = async e => { e.preventDefault();
     const ids = [...document.querySelectorAll("input[name=ev-serie]:checked")].map(c => c.value);
     const data = {titre:$("#ev-titre").value.trim(), date:$("#ev-date").value, recurrent:$("#ev-rec").checked, note:$("#ev-note").value.trim()};
     if(!S.v4missing) data.serie_ids = ids;
-    const ok = await run(ex ? S.sb.from("evenements").update(data).eq("id", ex.id) : S.sb.from("evenements").insert(data), ex ? "Date modifiée." : "Date ajoutée au calendrier.");
+    const dates = ex ? [data.date] : [...new Set([data.date, ...[...document.querySelectorAll(".ev-extra")].map(i => i.value)].filter(Boolean))].sort();
+    const ok = await run(ex ? S.sb.from("evenements").update(data).eq("id", ex.id) : S.sb.from("evenements").insert(dates.map(d => ({...data, date:d}))), ex ? "Date modifiée." : dates.length>1 ? `${dates.length} dates ajoutées au calendrier.` : "Date ajoutée au calendrier.");
     if(!ok) return;
     if(ex){ // séries décochées : on retire leurs stories à venir
       const removed = (ex.serie_ids||[]).filter(id => !ids.includes(id));
