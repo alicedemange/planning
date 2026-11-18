@@ -6,6 +6,12 @@
 <title>Planning réseaux Cha'mania</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 40%22%3E%3Cpath d=%22M20 35C8 26 3 19 3 12.5 3 7.5 7 4 11.5 4 15 4 18 6 20 9c2-3 5-5 8.5-5C33 4 37 7.5 37 12.5 37 19 32 26 20 35Z%22 fill=%22%23f75b95%22/%3E%3C/svg%3E">
 <meta name="theme-color" content="#f75b95">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Cha'mania">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chewy&family=Roboto+Condensed:wght@400;500;700&display=swap" rel="stylesheet">
@@ -151,7 +157,7 @@ main{padding:20px 24px 80px;max-width:1280px;margin:0 auto}
 .st.publie{background:var(--ok-wash);color:var(--ok)}
 
 /* ---------- Atelier ---------- */
-.board{display:grid;grid-template-columns:repeat(4,minmax(240px,1fr));gap:14px;overflow-x:auto;padding-bottom:8px}
+.board{display:grid;grid-template-columns:repeat(5,minmax(220px,1fr));gap:14px;overflow-x:auto;padding-bottom:8px}
 .col{background:rgba(255,255,255,.6);border:1px solid var(--line);border-radius:var(--r);padding:12px;display:flex;flex-direction:column;gap:8px;min-height:200px}
 .col-h{display:flex;align-items:center;gap:8px;margin-bottom:4px}
 .col-h h2{font-family:var(--display);font-weight:400;font-size:22px}
@@ -302,7 +308,7 @@ label.f span.h{font-weight:400;color:var(--muted)}
   .day .pill,.day .more{display:none}
   .dots{display:flex}
   .cal .dow{font-size:11px;padding:2px}
-  .board{grid-template-columns:repeat(4,82vw);scroll-snap-type:x mandatory}
+  .board{grid-template-columns:repeat(5,82vw);scroll-snap-type:x mandatory}
   .col{scroll-snap-align:start}
   .feed-wrap{grid-template-columns:1fr}
   .row2,.row3{grid-template-columns:1fr}
@@ -332,6 +338,88 @@ body.logged-out header.top, body.logged-out nav.tabs, body.logged-out #summary, 
 .pinpad button{height:60px;border-radius:16px;border:1px solid var(--line);background:var(--creme);font-size:26px;font-weight:500}
 .pinpad button:active{background:var(--rose-wash);border-color:var(--rose-pale)}
 .login-err[hidden]{display:none}
+.bell{position:relative;border:0;background:transparent;padding:6px;border-radius:10px;color:var(--muted);display:inline-flex}
+.bell:hover{background:var(--rose-wash);color:var(--ink)}
+.bell svg{width:24px;height:24px}
+.bell-n{position:absolute;top:0;right:0;background:var(--rose);color:#fff;border-radius:999px;font-size:11px;font-weight:700;min-width:18px;height:18px;display:flex;align-items:center;justify-content:center;padding:0 4px}
+.bell-n[hidden]{display:none}
+.nlist{display:flex;flex-direction:column;gap:8px}
+.nitem{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:var(--paper);border:1px solid var(--line);text-align:left;width:100%}
+.nitem.unread{border-color:var(--rose-pale);background:var(--rose-wash)}
+.nitem b{display:block}
+.nitem .nb{display:block;color:var(--ink);font-size:14px;margin-top:2px}
+.nitem small{display:block;color:var(--muted);font-size:12px;margin-top:3px}
+.valbox{border-radius:12px;padding:12px 14px;background:var(--turq-wash);border:1px solid var(--turq-pale);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.valbox.warn{background:var(--warn-wash);border-color:#f0dc9c}
+.valbox.ok{background:var(--ok-wash);border-color:#bfe3d2}
+.valbox p{margin:0;flex:1;min-width:200px}
+.mention{color:var(--rose-deep)}
+.mention-sug{display:flex;gap:6px;flex-wrap:wrap}
+.mention-sug:not(:empty){margin-top:6px}
+.mention-sug button{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--rose-pale);background:var(--paper);border-radius:999px;padding:3px 10px 3px 3px;font-weight:700;font-size:14px}
+.pfbtn.sched{background:#eef0ff;border-color:#d5d9f5;color:#4a55a2}
+.st.validation{background:var(--turq-wash);color:var(--turq-deep)}
+.st.programme{background:#eef0ff;color:#4a55a2}
+.pill.st-validation{background:var(--turq-wash);font-weight:700}
+.pill.st-programme{background:#eef0ff;color:#4a55a2}
+.col.validation .col-h h2{color:var(--turq-deep)}
+.col.programme .col-h h2{color:#4a55a2}
+.cheffe-tag{font-size:11px;font-weight:700;background:var(--turq-wash);color:var(--turq-deep);border-radius:999px;padding:1px 7px}
+.chip input:disabled + span{opacity:.45;cursor:not-allowed}
+.stepper{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.step{display:flex;gap:8px;align-items:flex-start;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:10px;min-width:0}
+.step.current{border-color:var(--rose);box-shadow:0 0 0 1px var(--rose) inset}
+.step.done{background:var(--ok-wash);border-color:#bfe3d2}
+.step-dot{width:28px;height:28px;border-radius:50%;background:var(--creme);display:flex;align-items:center;justify-content:center;flex:none;font-size:15px}
+.step.done .step-dot{background:var(--ok);color:#fff;font-weight:700}
+.step-b{display:flex;flex-direction:column;gap:4px;min-width:0;align-items:flex-start}
+.step-b small{color:var(--muted);font-size:13px}
+.step-b .btn{white-space:normal;text-align:left}
+.linkbtn{border:0;background:none;color:var(--muted);font-size:12px;text-decoration:underline;padding:0}
+.roles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.roles label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted);font-weight:700}
+.role-sel{padding:7px 10px!important;font-size:15px!important}
+.approvals{display:flex;flex-direction:column;gap:6px}
+.appr{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:15px}
+.appr.ok{border-color:#bfe3d2;background:var(--ok-wash)}
+.appr.ko{border-color:#f0dc9c;background:var(--warn-wash)}
+.appr small{color:var(--muted);display:block;font-size:12px}
+.todo{display:flex;flex-direction:column;gap:8px}
+.todo-row{display:grid;grid-template-columns:auto 1fr auto 56px;gap:12px;align-items:center;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:10px 12px;cursor:pointer;box-shadow:var(--shadow)}
+.todo-row:hover{border-color:var(--rose-pale)}
+.todo-row.waiting{opacity:.6;box-shadow:none}
+.group.late .todo-row{border-left:5px solid var(--late)}
+.todo-ico{width:40px;height:40px;border-radius:12px;background:var(--rose-wash);display:flex;align-items:center;justify-content:center;font-size:20px}
+.k-visuel .todo-ico{background:#fdeef6}.k-texte .todo-ico{background:#fff3dc}.k-valider .todo-ico,.k-envoyer .todo-ico{background:var(--turq-wash)}.k-poster .todo-ico{background:var(--rose-wash)}.k-tag .todo-ico{background:#eef0ff}
+.todo-b{display:flex;flex-direction:column;min-width:0}
+.todo-b b{font-size:16px}
+.todo-b span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.todo-b small{color:var(--muted);font-size:13px}
+.todo-act{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.todo-thumb{width:56px;height:56px;border-radius:10px;overflow:hidden;background:var(--creme)}
+.todo-thumb img,.todo-thumb video{width:100%;height:100%;object-fit:cover}
+.sugg{background:var(--paper);border:1px dashed var(--turq-pale);border-radius:var(--r);padding:14px;margin:6px 0 22px}
+.sugg-h{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.sugg-h h3{font-family:var(--display);font-weight:400;font-size:22px;color:var(--turq-deep);margin-right:auto}
+.sugg-list{display:flex;flex-direction:column;gap:8px}
+.sugg-item{display:flex;gap:12px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:8px 10px;background:var(--creme)}
+.sugg-item>div{flex:1;min-width:0}
+.sugg-item b{display:block}
+.sugg-item small{color:var(--muted)}
+.sugg-ico{width:34px;height:34px;border-radius:10px;background:var(--turq-wash);display:flex;align-items:center;justify-content:center;flex:none;color:var(--turq-deep)}
+.favs{display:flex;gap:6px;flex-wrap:wrap}
+.fav{border:1px dashed var(--turq);background:var(--turq-wash);color:var(--turq-deep);border-radius:999px;padding:3px 10px;font-size:13px;font-weight:700}
+.evt{font-size:11px;line-height:1.2;color:#8a5a00;background:#fff3dc;border-radius:5px;padding:2px 4px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.dots i.ev{background:#e3a008!important;border-radius:2px}
+.evrow{display:flex;gap:10px;align-items:center;background:#fff8e8;border:1px solid #f0dc9c;border-radius:12px;padding:8px 12px;margin-bottom:8px;flex-wrap:wrap}
+.evrow div{flex:1;min-width:200px}
+.evrow small{display:block;color:var(--muted)}
+@media (max-width:760px){
+  .stepper,.roles{grid-template-columns:1fr 1fr}
+  .todo-row{grid-template-columns:auto 1fr;grid-template-areas:"ico b" "act act"}
+  .todo-ico{grid-area:ico}.todo-b{grid-area:b}.todo-act{grid-area:act;justify-content:flex-start}.todo-thumb{display:none}
+  .day .evt{display:none}
+}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -341,6 +429,7 @@ body.logged-out header.top, body.logged-out nav.tabs, body.logged-out #summary, 
     <svg class="heart" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 35 C8 26 3 19 3 12.5 C3 7.5 7 4 11.5 4 C15 4 18 6 20 9 C22 6 25 4 28.5 4 C33 4 37 7.5 37 12.5 C37 19 32 26 20 35Z" fill="#f75b95"/><path d="M13 21 l2-5 2 3 h6 l2-3 2 5 c0 4-3 7-7 7 s-7-3-7-7z" fill="#fffcf7"/><circle cx="17.5" cy="22" r="1" fill="#1f1a1d"/><circle cx="22.5" cy="22" r="1" fill="#1f1a1d"/></svg>
     <div><h1>Cha'mania</h1><small>Planning des réseaux sociaux</small></div>
   </div>
+  <button class="bell" data-action="notifs" id="bell" type="button" aria-label="Notifications"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 8a6 6 0 1112 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 003.4 0"/></svg><span class="bell-n" id="bell-n" hidden>0</span></button>
   <button class="me-btn" data-action="profile" id="me-btn" type="button"><span class="avatar empty">?</span><span>Qui es-tu ?</span></button>
   <button class="btn ghost" data-action="team" type="button" title="Gérer l'équipe"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><circle cx="17" cy="9" r="2.6"/><path d="M16 14.6c2.8-.2 4.9 1.5 5.5 4.4"/></svg><span class="teambtn-label">Équipe</span></button>
   <button class="btn primary newbtn" data-action="new" type="button" id="new-btn">+ Nouveau post</button>
@@ -349,6 +438,7 @@ body.logged-out header.top, body.logged-out nav.tabs, body.logged-out #summary, 
 <section class="summary" id="summary" aria-label="Résumé"></section>
 
 <nav class="tabs" aria-label="Vues">
+  <a href="#todo" data-view="todo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>Ma to-do</a>
   <a href="#a-poster" data-view="a-poster"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 12l5 5L20 6"/></svg>À poster</a>
   <a href="#calendrier" data-view="calendrier"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Calendrier</a>
   <a href="#feed" data-view="feed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Aperçu du feed</a>
@@ -387,7 +477,7 @@ const RUB = {
   autre:{label:"Autre", c:"#9a9196"}
 };
 const FORMATS = {post:"Post", carrousel:"Carrousel", reel:"Reel / vidéo", story:"Story"};
-const STATUS = {idee:"Idée", creation:"En création", pret:"Prêt à poster", publie:"Publié"};
+const STATUS = {idee:"Idée", creation:"En création", validation:"À valider", pret:"Prêt à poster", programme:"Programmé", publie:"Publié"};
 const PF = {facebook:{label:"Facebook", s:"f"}, instagram:{label:"Instagram", s:"IG"}};
 const MEMBER_COLORS = ["#f75b95","#31bbbb","#f2b134","#7d6bb0","#1d7f7f","#b8336a","#e0703a","#5a8f3c"];
 const JOURS=["dim.","lun.","mar.","mer.","jeu.","ven.","sam."];
@@ -435,9 +525,16 @@ const initials = n => (n||"?").trim().split(/\s+/).map(w=>w[0]).join("").slice(0
 function avatarHTML(id, size){ const m = member(id); if(!m) return `<span class="avatar empty"${size?` style="width:${size}px;height:${size}px"`:""}>?</span>`; return `<span class="avatar" style="background:${esc(m.color)};${size?`width:${size}px;height:${size}px`:""}">${esc(initials(m.name))}</span>`; }
 const pfIcon = k => `<span class="pf ${k}" aria-hidden="true">${PF[k].s}</span>`;
 const platforms = p => (p.platforms||[]).filter(k => PF[k]);
-const isPub = (p,k) => !!(p.published && p.published[k]);
-const allPub = p => platforms(p).length>0 && platforms(p).every(k => isPub(p,k));
-function effStatus(p){ if(p.status==="publie" || (p.status==="pret" && allPub(p))) return "publie"; return STATUS[p.status] ? p.status : "idee"; }
+const pubEntry = (p,k) => p.published && p.published[k];
+// "Programmé" : compte comme publié une fois l'heure passée
+const isSched = (p,k) => { const pb = pubEntry(p,k); return !!(pb && pb.scheduled && new Date(pb.at) > new Date()); };
+const isPub = (p,k) => !!pubEntry(p,k) && !isSched(p,k);
+const handled = (p,k) => !!pubEntry(p,k);
+const allPub = p => platforms(p).length>0 && platforms(p).every(k => handled(p,k));
+function effStatus(p){
+  if(p.status==="publie" || (p.status==="pret" && allPub(p))) return platforms(p).some(k => isSched(p,k)) ? "programme" : "publie";
+  return (STATUS[p.status] && p.status!=="programme") ? p.status : "idee";
+}
 const sortKey = p => (p.date||"9999-99-99") + " " + (p.time||"99:99");
 const byDate = (a,b) => sortKey(a) < sortKey(b) ? -1 : sortKey(a) > sortKey(b) ? 1 : 0;
 const media = p => (p.media||[]).filter(m => m && m.path);
@@ -465,17 +562,19 @@ const fullCaption = p => [p.caption||"", p.hashtags||""].filter(Boolean).join("\
 /* ================== Données (Supabase) ================== */
 const normPost = r => ({...r, date:r.date||"", time:r.time?String(r.time).slice(0,5):"", assignee:r.assignee||"", media:Array.isArray(r.media)?r.media:[], published:r.published||{}, platforms:r.platforms||[]});
 async function loadPosts(){ const {data,error} = await S.sb.from("posts").select("*"); if(error) throw error; S.posts = data.map(normPost); }
-async function loadTeam(){ const {data,error} = await S.sb.from("membres").select("*").order("created_at"); if(error) throw error; S.team = data.map(p => ({id:p.id, name:p.name||"Sans nom", color:p.color||"#f75b95"})); }
+async function loadTeam(){ const {data,error} = await S.sb.from("membres").select("*").order("created_at"); if(error) throw error; S.team = data.map(p => ({id:p.id, name:p.name||"Sans nom", color:p.color||"#f75b95", is_cheffe:!!p.is_cheffe})); }
 async function loadComments(){ const {data,error} = await S.sb.from("comments").select("*").order("created_at"); if(error) throw error; S.comments = data; }
 const pending = {};
 function refreshSoon(what){
   clearTimeout(pending[what]);
   pending[what] = setTimeout(async () => {
-    try{ await ({posts:loadPosts, team:loadTeam, comments:loadComments})[what](); render(); }catch(e){ console.error(e); }
+    try{ await ({posts:loadPosts, team:loadTeam, comments:loadComments, notifs:loadNotifs, extras:loadExtras})[what](); render(); }catch(e){ console.error(e); }
   }, 250);
 }
 async function loadAll(){
   await Promise.all([loadPosts(), loadTeam(), loadComments()]);
+  await loadNotifs().catch(e => { console.error(e); S.notifs = []; });
+  await loadExtras().catch(e => { console.error(e); S.v3missing = true; });
   S.loaded = true; S.error = null;
 }
 let channel = null;
@@ -485,9 +584,13 @@ function subscribe(){
     .on("postgres_changes", {event:"*", schema:"public", table:"posts"}, () => refreshSoon("posts"))
     .on("postgres_changes", {event:"*", schema:"public", table:"comments"}, () => refreshSoon("comments"))
     .on("postgres_changes", {event:"*", schema:"public", table:"membres"}, () => refreshSoon("team"))
+    .on("postgres_changes", {event:"*", schema:"public", table:"notifications"}, () => refreshSoon("notifs"))
+    .on("postgres_changes", {event:"*", schema:"public", table:"reglages"}, () => refreshSoon("extras"))
+    .on("postgres_changes", {event:"*", schema:"public", table:"evenements"}, () => refreshSoon("extras"))
+    .on("postgres_changes", {event:"*", schema:"public", table:"favoris"}, () => refreshSoon("extras"))
     .subscribe();
 }
-document.addEventListener("visibilitychange", () => { if(!document.hidden && S.session){ refreshSoon("posts"); refreshSoon("comments"); } });
+document.addEventListener("visibilitychange", () => { if(!document.hidden && S.session){ refreshSoon("posts"); refreshSoon("comments"); refreshSoon("notifs"); } });
 
 function failMsg(e){
   console.error(e);
@@ -529,28 +632,31 @@ async function removeFiles(paths){ if(paths.length) await S.sb.storage.from(BUCK
 
 /* ================== Rendu général ================== */
 function setView(v){
-  if(!["a-poster","calendrier","feed","atelier"].includes(v)) v="a-poster";
+  if(!["todo","a-poster","calendrier","feed","atelier"].includes(v)) v="todo";
   S.view=v;
   document.querySelectorAll("nav.tabs a").forEach(a => a.setAttribute("aria-current", a.dataset.view===v ? "page" : "false"));
   render();
 }
-window.addEventListener("hashchange", () => setView(location.hash.slice(1)));
+window.addEventListener("hashchange", () => { if(!handleHash()) setView(location.hash.slice(1)); });
 
 function render(){
   const main = $("#main");
   if(!S.session){ document.body.classList.add("logged-out"); return; }
   document.body.classList.remove("logged-out");
-  renderMe(); renderSummary();
+  renderMe(); renderSummary(); renderBell();
   if(S.error && !S.loaded){ main.innerHTML = `<div class="empty-state"><strong>Planning inaccessible</strong>${esc(S.error)}</div>`; return; }
   if(!S.loaded){ main.innerHTML = `<div class="loading">Chargement du planning…</div>`; return; }
   let html = "";
-  if(S.view==="a-poster") html += renderAPoster();
+  if(S.v3missing) html += `<div class="banner warn"><p><b>Mise à jour de la base à faire :</b> lance le fichier <b>mise-a-jour-v3.sql</b> dans Supabase (SQL Editor) pour activer les nouveautés.</p></div>`;
+  if(S.view==="todo") html += renderTodo();
+  else if(S.view==="a-poster") html += renderAPoster();
   else if(S.view==="calendrier") html += renderCalendar();
   else if(S.view==="feed") html += renderFeed();
   else html += renderAtelier();
   main.innerHTML = html;
   if(S.openDetailId && !$("#ov1").hidden && $("#ov1").dataset.kind==="detail") openDetail(S.openDetailId, true);
 }
+setInterval(() => { if(S.loaded && $("#ov1").dataset.kind!=="editor" && !document.hidden) render(); }, 60000);
 function renderMe(){
   const m = meM(), b = $("#me-btn");
   b.innerHTML = m ? `${avatarHTML(m.id)}<span>${esc(m.name)}</span>` : `<span class="avatar empty">?</span><span>Qui es-tu ?</span>`;
@@ -566,7 +672,11 @@ function renderSummary(){
   const free = ready.filter(p => !member(p.assignee)).length;
   const mine = ready.filter(p => p.assignee===S.me).length;
   const m = meM();
+  const toValidate = S.posts.filter(p => effStatus(p)==="validation").length;
+  const [mon] = weekBounds(t), nWeek = postsInWeek(mon).length, obj = S.reglages?.objectif_semaine || 3;
   el.innerHTML =
+    `<div class="stat" title="Objectif réglable dans Équipe › Réglages"><span class="dot" style="background:${nWeek>=obj?"var(--ok)":"#f2b134"}"></span><b>${nWeek}/${obj}</b>posts cette semaine</div>` +
+    (m?.is_cheffe && toValidate ? `<a class="stat alert" href="#atelier" style="text-decoration:none;background:var(--turq-wash);border-color:var(--turq-pale)"><b style="color:var(--turq-deep)">${toValidate}</b>à valider par toi</a>` : "") +
     (late ? `<div class="stat alert"><b>${late}</b>en retard</div>` : "") +
     `<div class="stat"><span class="dot" style="background:var(--rose)"></span><b>${tod}</b>à poster aujourd'hui</div>` +
     `<div class="stat"><span class="dot" style="background:var(--turq)"></span><b>${week}</b>prêts pour les 7 prochains jours</div>` +
@@ -585,7 +695,9 @@ function cardHTML(p){
     `<span class="avatar empty">?</span><span>Personne pour l'instant</span> <button class="btn small turq" type="button" data-action="take" data-id="${p.id}">Je m'en occupe</button>`;
   const pubBtns = pfs.map(k => isPub(p,k)
       ? `<span class="pfbtn done">${pfIcon(k)}Publié ✓</span>`
-      : `<button class="pfbtn" type="button" data-action="publish" data-id="${p.id}" data-pf="${k}">${pfIcon(k)}J'ai publié</button>`).join("");
+      : isSched(p,k) ? `<span class="pfbtn sched">${pfIcon(k)}Programmé ⏱</span>`
+      : `<button class="pfbtn" type="button" data-action="publish" data-id="${p.id}" data-pf="${k}">${pfIcon(k)}J'ai publié</button>`).join("")
+    + (pfs.some(k => !handled(p,k)) && p.date ? `<button class="pfbtn sched" type="button" data-action="schedule" data-id="${p.id}" title="Je l'ai programmé dans Meta Business Suite">⏱ Programmé</button>` : "");
   return `<article class="pcard" data-open="${p.id}" tabindex="0" aria-label="${esc(p.title)}">
     <div class="pthumb">${thumbHTML(p)}</div>
     <div class="pbody">
@@ -610,8 +722,11 @@ function renderAPoster(){
     ["later","Plus tard", list.filter(p => p.date > w)],
     ["nodate","Sans date (à caler)", list.filter(p => !p.date)]
   ];
-  let html = `<div class="toolbar">${pfFilterHTML()}<label class="toggle"><input type="checkbox" data-action="mine" ${S.mineOnly?"checked":""}> Seulement mes posts (et ceux à prendre)</label></div>`;
-  const soon = S.posts.filter(p => (p.status==="creation"||p.status==="idee") && p.date && p.date>=t && p.date<=w).length;
+  let html = "";
+  const waiting = S.posts.filter(p => effStatus(p)==="validation").sort(byDate);
+  if(meM()?.is_cheffe && waiting.length) html += `<div class="banner"><p><b>${waiting.length} post${waiting.length>1?"s attendent":" attend"} ton feu vert.</b> Jette un œil aux visuels et au texte avant qu'ils partent.</p><button class="btn turq small" type="button" data-open="${waiting[0].id}">Voir ${waiting.length>1?"le premier":"le post"}</button></div>`;
+  html += `<div class="toolbar">${pfFilterHTML()}<label class="toggle"><input type="checkbox" data-action="mine" ${S.mineOnly?"checked":""}> Seulement mes posts (et ceux à prendre)</label></div>`;
+  const soon = S.posts.filter(p => ["idee","creation","validation"].includes(p.status) && p.date && p.date>=t && p.date<=w).length;
   if(!list.length){
     html += `<div class="empty-state"><strong>Rien à poster pour l'instant</strong>Dès qu'un post passe en « Prêt à poster », il apparaît ici avec son texte et ses visuels.</div>`;
   } else {
@@ -620,6 +735,8 @@ function renderAPoster(){
       html += `<section class="group ${k}"><div class="group-h"><h2>${label}</h2><span class="count">${arr.length} post${arr.length>1?"s":""}</span></div><div class="cards">${arr.map(cardHTML).join("")}</div></section>`;
     }
   }
+  const progs = S.posts.filter(p => effStatus(p)==="programme" && matchesPf(p)).sort(byDate);
+  if(progs.length) html += `<section class="group"><div class="group-h"><h2 style="color:#4a55a2">Programmés</h2><span class="count">rien à faire, ils partiront tout seuls</span></div>${progs.map(miniHTML).join("")}</section>`;
   if(soon) html += `<p class="hint">Et ${soon} post${soon>1?"s":""} encore en préparation pour les 7 prochains jours (visible${soon>1?"s":""} dans le calendrier).</p>`;
   return html;
 }
@@ -634,25 +751,28 @@ function renderCalendar(){
   const start = new Date(first); start.setDate(1-startOff);
   const posts = S.posts.filter(p => p.date && matchesPf(p)).sort(byDate);
   const byDay = {}; posts.forEach(p => (byDay[p.date] = byDay[p.date] || []).push(p));
+  const evDay = {}; eventsBetween(ymd(start), addDays(ymd(start), 42)).forEach(e => (evDay[e.date] = evDay[e.date] || []).push(e));
   let cells = ["lun.","mar.","mer.","jeu.","ven.","sam.","dim."].map(d => `<div class="dow">${d}</div>`).join("");
   const d = new Date(start);
   for(let i=0;i<42;i++){
     const ds = ymd(d), arr = byDay[ds]||[], other = d.getMonth()!==m0.getMonth();
     if(i>=35 && other && i%7===0) break;
-    const pills = arr.slice(0,3).map(p => { const s=effStatus(p); return `<div class="pill st-${s}" style="--c:${rub(p).c}" data-open="${p.id}" title="${esc(p.title)}">${s==="publie"?"✓ ":""}<span class="t">${p.time?fmtTime(p.time)+" ":""}${esc(p.title||"Sans titre")}</span></div>`; }).join("");
+    const pills = arr.slice(0,3).map(p => { const s=effStatus(p); return `<div class="pill st-${s}" style="--c:${rub(p).c}" data-open="${p.id}" title="${esc(p.title)}">${s==="publie"?"✓ ":s==="programme"?"⏱ ":""}<span class="t">${p.time?fmtTime(p.time)+" ":""}${esc(p.title||"Sans titre")}</span></div>`; }).join("");
     cells += `<div class="day${other?" other":""}${ds===t?" today":""}${ds===S.selDay?" sel":""}" data-action="selday" data-day="${ds}" role="button" tabindex="0" aria-label="${fmtLong(ds)}, ${arr.length} post${arr.length>1?"s":""}">
-      <span class="num">${d.getDate()}</span>${pills}${arr.length>3?`<span class="more">+${arr.length-3} autre${arr.length-3>1?"s":""}</span>`:""}
-      <div class="dots">${arr.slice(0,6).map(p=>`<i style="background:${rub(p).c};${effStatus(p)==="idee"?"opacity:.4":""}"></i>`).join("")}</div></div>`;
+      <span class="num">${d.getDate()}</span>${(evDay[ds]||[]).map(e=>`<div class="evt" title="${esc(e.titre)}">🎉 ${esc(e.titre)}</div>`).join("")}${pills}${arr.length>3?`<span class="more">+${arr.length-3} autre${arr.length-3>1?"s":""}</span>`:""}
+      <div class="dots">${(evDay[ds]||[]).map(()=>`<i class="ev"></i>`).join("")}${arr.slice(0,6).map(p=>`<i style="background:${rub(p).c};${effStatus(p)==="idee"?"opacity:.4":""}"></i>`).join("")}</div></div>`;
     d.setDate(d.getDate()+1);
   }
   const dayPosts = (byDay[S.selDay]||[]);
-  const panel = `<section class="daypanel"><div class="dayp-h"><h3>${esc(fmtLong(S.selDay))}</h3><button class="btn small primary" type="button" data-action="new" data-day="${S.selDay}">+ Post ce jour-là</button></div>
-    ${dayPosts.length ? dayPosts.map(miniHTML).join("") : `<p class="hint">Aucun post prévu ce jour-là.</p>`}</section>`;
+  S._dayEvents = eventsOn(S.selDay);
+  const evRows = S._dayEvents.map((e,i) => { const done = postForEvent(e.key); return `<div class="evrow"><div><b>🎉 ${esc(e.titre)}</b><small>${esc(e.note||"")}</small></div>${done?`<button class="btn small ghost" type="button" data-open="${done.id}">Voir le post</button>`:`<button class="btn small turq" type="button" data-action="prep-event" data-i="${i}">Préparer un post</button>`}</div>`; }).join("");
+  const panel = `<section class="daypanel"><div class="dayp-h"><h3>${esc(fmtLong(S.selDay))}</h3><button class="btn small ghost" type="button" data-action="add-event" data-day="${S.selDay}">+ Date de l'asso</button><button class="btn small primary" type="button" data-action="new" data-day="${S.selDay}">+ Post ce jour-là</button></div>
+    ${evRows}${dayPosts.length ? dayPosts.map(miniHTML).join("") : `<p class="hint">Aucun post prévu ce jour-là.</p>`}</section>`;
   const undated = S.posts.filter(p => !p.date && effStatus(p)!=="publie" && matchesPf(p));
-  return `<div class="toolbar">${pfFilterHTML()}</div>
+  return `${suggestionsHTML()}<div class="toolbar">${pfFilterHTML()}</div>
     <div class="cal-head"><button class="btn small" type="button" data-action="cal" data-d="-1" aria-label="Mois précédent">‹</button><h2>${MOIS_L[m0.getMonth()]} ${m0.getFullYear()}</h2><button class="btn small" type="button" data-action="cal" data-d="1" aria-label="Mois suivant">›</button><button class="btn small ghost" type="button" data-action="cal" data-d="0">Aujourd'hui</button></div>
     <div class="cal">${cells}</div>
-    <div class="legend"><span><i class="sw" style="border:1px dashed var(--muted);border-left:4px solid var(--rose)"></i>Idée</span><span><i class="sw" style="background:var(--creme);border:1px solid var(--line);border-left:4px solid var(--rose)"></i>En création</span><span><i class="sw" style="background:var(--rose-wash)"></i>Prêt à poster</span><span><i class="sw" style="background:var(--ok-wash);border-left-color:var(--ok)"></i>Publié</span><span>La couleur du bord = la rubrique</span></div>
+    <div class="legend"><span><i class="sw" style="border:1px dashed var(--muted);border-left:4px solid var(--rose)"></i>Idée</span><span><i class="sw" style="background:var(--creme);border:1px solid var(--line);border-left:4px solid var(--rose)"></i>En création</span><span><i class="sw" style="background:var(--turq-wash)"></i>À valider</span><span><i class="sw" style="background:var(--rose-wash)"></i>Prêt à poster</span><span><i class="sw" style="background:#eef0ff;border-left-color:#4a55a2"></i>Programmé</span><span><i class="sw" style="background:var(--ok-wash);border-left-color:var(--ok)"></i>Publié</span><span><i class="sw" style="background:#fff3dc;border-left-color:#e3a008"></i>🎉 Marronnier / date de l'asso</span><span>La couleur du bord = la rubrique</span></div>
     ${panel}
     ${undated.length ? `<section class="daypanel"><div class="dayp-h"><h3>Pas encore de date</h3></div>${undated.map(miniHTML).join("")}</section>` : ""}`;
 }
@@ -665,22 +785,25 @@ function miniHTML(p){
 
 /* ================== Vue : Atelier ================== */
 function renderAtelier(){
-  const cols = [["idee","Idées"],["creation","En création"],["pret","Prêts à poster"],["publie","Publiés"]];
+  const cols = [["idee","Idées"],["creation","En création"],["validation","À valider"],["pret","Prêts à poster"],["publie","Publiés"]];
+  const amCheffe = !!meM()?.is_cheffe;
   const cutoff = addDays(today(),-45);
-  const nextOf = {idee:["creation","Je commence"], creation:["pret","C'est prêt !"]};
+  const nextOf = {idee:["creation","Je commence"], creation: ["validation","Envoyer pour validation"]};
+  if(amCheffe) nextOf.validation = ["pret","Feu vert ✓"];
   const html = cols.map(([k,label]) => {
-    let arr = S.posts.filter(p => effStatus(p)===k);
+    let arr = S.posts.filter(p => effStatus(p)===k || (k==="publie" && effStatus(p)==="programme"));
     if(k==="publie") arr = arr.filter(p => !p.date || p.date >= cutoff).sort((a,b)=>byDate(b,a));
     else arr.sort(byDate);
     const cards = arr.map(p => `<div class="acard" style="--c:${rub(p).c}" data-open="${p.id}" role="button" tabindex="0">
         <b>${esc(p.title||"Sans titre")}</b>
         <div class="row">${platforms(p).map(pfIcon).join("")}<span>${esc(fmtWhen(p))}</span>${media(p).length?`<span>· ${media(p).length} visuel${media(p).length>1?"s":""}</span>`:""}<span style="margin-left:auto">${avatarHTML(p.assignee,22)}</span></div>
-        ${nextOf[k] ? `<button class="next" type="button" data-action="advance" data-id="${p.id}" data-to="${nextOf[k][0]}">${nextOf[k][1]} →</button>` : ""}
+        ${effStatus(p)==="programme" ? `<span class="st programme" style="align-self:flex-start">Programmé</span>` : ""}
+        ${nextOf[k] ? `<button class="next" type="button" data-action="advance" data-id="${p.id}" data-to="${nextOf[k][0]}">${nextOf[k][1]} →</button>` : k==="validation" ? `<span class="hint" style="font-size:13px">En attente de ${esc((S.reglages?.validatrices||[]).join(" ou ")||cheffes().map(m=>m.name).join(" ou ")||"la validation")}</span>` : ""}
       </div>`).join("");
     const quick = k==="idee" ? `<form class="quick" data-action="quick-idea"><label class="sr" for="quick-idea">Nouvelle idée</label><input id="quick-idea" type="text" placeholder="Une idée ? Note-la ici…" autocomplete="off"><button class="btn small" type="submit">Ajouter</button></form>` : "";
     return `<section class="col ${k}"><div class="col-h"><h2>${label}</h2><span class="count">${arr.length}</span></div>${quick}${cards || `<p class="hint">Rien ici.</p>`}</section>`;
   }).join("");
-  return `<p class="hint" style="margin-top:0">L'atelier, c'est la cuisine : on note les idées, on prépare, et quand c'est prêt l'équipe le voit dans « À poster ».</p><div class="board">${html}</div>`;
+  return `${suggestionsHTML()}<p class="hint" style="margin-top:0">L'atelier, c'est la cuisine : on note les idées, on prépare, et quand c'est prêt l'équipe le voit dans « À poster ».</p><div class="board">${html}</div>`;
 }
 
 /* ================== Vue : Aperçu du feed ================== */
@@ -688,9 +811,9 @@ const ICO_CAROUSEL = `<svg class="ico" viewBox="0 0 24 24" fill="#fff" aria-labe
 const ICO_REEL = `<svg class="ico" viewBox="0 0 24 24" fill="#fff" aria-label="Vidéo"><path d="M8 5v14l11-7z"/></svg>`;
 const LOGO_SM = `<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 35 C8 26 3 19 3 12.5 C3 7.5 7 4 11.5 4 C15 4 18 6 20 9 C22 6 25 4 28.5 4 C33 4 37 7.5 37 12.5 C37 19 32 26 20 35Z" fill="#f75b95"/><path d="M13 21 l2-5 2 3 h6 l2-3 2 5 c0 4-3 7-7 7 s-7-3-7-7z" fill="#fffcf7"/></svg>`;
 function feedList(pf){
-  const ok = ["pret","publie"].concat(S.feedDrafts ? ["creation","idee"] : []);
+  const ok = ["pret","programme","publie"].concat(S.feedDrafts ? ["validation","creation","idee"] : []);
   const list = S.posts.filter(p => platforms(p).includes(pf) && p.format!=="story" && ok.includes(effStatus(p)));
-  const planned = list.filter(p => !isPub(p,pf) && effStatus(p)!=="publie");
+  const planned = list.filter(p => !isPub(p,pf));
   const done = list.filter(p => !planned.includes(p));
   planned.sort((a,b) => byDate(b,a));
   done.sort((a,b) => { const x=(a.published?.[pf]?.at)||sortKey(a), y=(b.published?.[pf]?.at)||sortKey(b); return x<y?1:x>y?-1:0; });
@@ -698,9 +821,9 @@ function feedList(pf){
 }
 function renderFeed(){
   const pf = S.feedPf, {planned, done} = feedList(pf);
-  const flag = p => { const s=effStatus(p); return s==="pret" ? `<span class="flag">${p.date?esc(fmtShort(p.date)):"Sans date"}</span>` : `<span class="flag draft">${STATUS[s]}</span>`; };
+  const flag = p => { const s=effStatus(p); return (s==="pret"||s==="programme") ? `<span class="flag">${isSched(p,pf)?"⏱ ":""}${p.date?esc(fmtShort(p.date)):"Sans date"}</span>` : `<span class="flag draft">${STATUS[s]}</span>`; };
   const tile = (p, isPlanned) => { const ms = media(p), s = effStatus(p);
-    return `<button type="button" class="tile${isPlanned?(s==="pret"?" planned":" draft"):""}" data-open="${p.id}" aria-label="${esc(p.title)}">${thumbHTML(p).replace(/<span class="badge-n">.*?<\/span>/,"")}${ms.length>1?ICO_CAROUSEL:(ms[0]?.type==="video"||p.format==="reel")?ICO_REEL:""}${isPlanned?flag(p):""}</button>`; };
+    return `<button type="button" class="tile${isPlanned?((s==="pret"||s==="programme")?" planned":" draft"):""}" data-open="${p.id}" aria-label="${esc(p.title)}">${thumbHTML(p).replace(/<span class="badge-n">.*?<\/span>/,"")}${ms.length>1?ICO_CAROUSEL:(ms[0]?.type==="video"||p.format==="reel")?ICO_REEL:""}${isPlanned?flag(p):""}</button>`; };
   let phone;
   if(pf==="instagram"){
     phone = `<div class="phone"><div class="phone-top"><div class="pp"><div>${LOGO_SM}</div></div><div><b>Cha'mania</b><small>${planned.length} post${planned.length>1?"s":""} prévu${planned.length>1?"s":""} · ${done.length} déjà en ligne</small></div></div>
@@ -758,20 +881,33 @@ function openDetail(id, refresh){
   const gallery = ms.length ? `<div class="sec"><h4>Visuels (${ms.length}) · dans l'ordre de publication</h4><div class="gallery">${ms.map((m,i)=>`<figure><div class="gimg">${m.type==="video"?`<video src="${esc(mediaUrl(m))}" controls playsinline preload="metadata"></video>`:`<img src="${esc(mediaUrl(m))}" alt="Visuel ${i+1}">`}</div>
       <figcaption><button class="btn small" type="button" data-action="dl" data-id="${p.id}" data-i="${i}">Télécharger</button><a class="btn small ghost" href="${esc(mediaUrl(m))}" target="_blank" rel="noopener">Ouvrir en grand</a></figcaption></figure>`).join("")}</div></div>` : "";
   const link = safeUrl(p.link);
+  const canPublish = ["pret","programme","publie"].includes(s);
   const pubs = pfs.map(k => { const pb = p.published?.[k];
-    if(pb){ const by = member(pb.by); return `<div class="pubrow done"><span class="lbl">${pfIcon(k)}${PF[k].label} : publié ✓</span><span class="hint">le ${esc(fmtStamp(pb.at))}${by?" par "+esc(by.name):""}</span>
+    if(pb && isSched(p,k)){ const by = member(pb.by); return `<div class="pubrow" style="background:#eef0ff;border-color:#d5d9f5"><span class="lbl">${pfIcon(k)}${PF[k].label} : programmé ⏱</span><span class="hint">pour le ${esc(fmtStamp(pb.at))}${by?" · par "+esc(by.name):""}</span><button class="btn small ghost" type="button" data-action="unpublish" data-id="${p.id}" data-pf="${k}">Annuler</button></div>`; }
+    if(pb){ const by = member(pb.by); return `<div class="pubrow done"><span class="lbl">${pfIcon(k)}${PF[k].label} : publié ✓</span><span class="hint">le ${esc(fmtStamp(pb.at))}${pb.scheduled?" (programmé)":""}${by?" par "+esc(by.name):""}</span>
       <input type="url" placeholder="Coller le lien du post (facultatif)" value="${esc(pb.url||"")}" data-action="publink" data-id="${p.id}" data-pf="${k}" aria-label="Lien du post ${PF[k].label}">${safeUrl(pb.url)?`<a class="btn small ghost" href="${esc(pb.url)}" target="_blank" rel="noopener">Voir</a>`:""}<button class="btn small ghost" type="button" data-action="unpublish" data-id="${p.id}" data-pf="${k}">Annuler</button></div>`; }
-    return `<div class="pubrow"><span class="lbl">${pfIcon(k)}${PF[k].label} : pas encore publié</span>${s!=="idee" && s!=="creation"?`<button class="btn small turq" type="button" data-action="publish" data-id="${p.id}" data-pf="${k}">J'ai publié sur ${PF[k].label}</button>`:`<span class="hint">Pas encore prêt</span>`}</div>`; }).join("");
+    return `<div class="pubrow"><span class="lbl">${pfIcon(k)}${PF[k].label} : pas encore publié</span>${canPublish?`<button class="btn small turq" type="button" data-action="publish" data-id="${p.id}" data-pf="${k}">J'ai publié</button><button class="btn small" type="button" data-action="schedule" data-id="${p.id}" data-pf="${k}">⏱ Je l'ai programmé</button>`:`<span class="hint">${s==="validation"?"En attente du feu vert":"Pas encore prêt"}</span>`}</div>`; }).join("");
+  const amCheffe = !!meM()?.is_cheffe, chefNames = cheffes().map(m=>m.name).join(" ou ");
+  let valBox = "";
+  if(s==="validation") valBox = amCheffe
+    ? `<div class="valbox"><p><b>Ce post attend ton feu vert.</b> Vérifie le visuel et le texte ci-dessous.</p><button class="btn small turq" type="button" data-action="approve" data-id="${p.id}">✓ Feu vert</button><button class="btn small" type="button" data-action="revise" data-id="${p.id}">À revoir</button></div>`
+    : `<div class="valbox"><p>⏳ En attente du feu vert de <b>${esc((S.reglages?.validatrices||[]).join(" ou ") || chefNames || "la cheffe")}</b>.</p></div>`;
+  if(s==="validation" && p.validation_token) valBox += `<div class="copyrow" style="margin:0"><button class="btn small" type="button" data-action="share-validation" data-id="${p.id}">📤 Renvoyer le lien de validation dans Messenger</button></div>`;
+  const validator = member(p.validated_by);
   const assigneeSel = `<select class="inp" style="width:auto" data-action="assign" data-id="${p.id}" aria-label="Qui poste ?"><option value="">Personne pour l'instant</option>${S.team.map(m=>`<option value="${esc(m.id)}" ${m.id===p.assignee?"selected":""}>${esc(m.name)}</option>`).join("")}</select>`;
-  const cmts = S.comments.filter(c => c.post_id===p.id).map(c => `<div class="cmt">${avatarHTML(c.author)}<div><small>${esc(member(c.author)?.name||"Quelqu'un")} · ${esc(fmtStamp(c.created_at))}</small><div class="bubble">${esc(c.text)}</div></div></div>`).join("");
+  const cmts = S.comments.filter(c => c.post_id===p.id).map(c => `<div class="cmt">${c.author||!c.author_name?avatarHTML(c.author):`<span class="avatar" style="background:#9a9196">${esc(initials(c.author_name))}</span>`}<div><small>${esc(member(c.author)?.name||c.author_name||"Quelqu'un")} · ${esc(fmtStamp(c.created_at))}</small><div class="bubble">${commentHTML(c.text)}</div></div></div>`).join("");
   const creator = member(p.created_by);
   const html = `<div class="modal" role="dialog" aria-modal="true" aria-labelledby="d-t">
     <div class="m-head"><div style="flex:1;display:flex;flex-direction:column;gap:6px"><div class="pmeta">${tagHTML(p)}${stHTML(p)}<span class="fmt">${esc(FORMATS[p.format]||"Post")}</span></div><h2 id="d-t">${esc(p.title||"Sans titre")}</h2></div><button class="x" type="button" data-action="close1" aria-label="Fermer">×</button></div>
     <div class="m-body">
       <dl class="kv"><dt>Quand</dt><dd><b>${esc(p.date?fmtLong(p.date):"Pas encore de date")}${p.time?" à "+fmtTime(p.time):""}</b></dd>
         <dt>Où</dt><dd>${pfs.map(k=>`${pfIcon(k)} ${PF[k].label}`).join(" &nbsp; ")||"À choisir"}</dd>
-        <dt>Qui poste</dt><dd style="display:flex;align-items:center;gap:8px">${assigneeSel}</dd>
-        ${creator?`<dt>Créé par</dt><dd>${esc(creator.name)}</dd>`:""}</dl>
+        ${creator?`<dt>Créé par</dt><dd>${esc(creator.name)}</dd>`:""}
+        ${(validator||p.validated_name) && ["pret","programme","publie"].includes(s)?`<dt>Feu vert</dt><dd>✓ ${esc(p.validated_name || validator.name)}${p.validated_at?", le "+esc(fmtStamp(p.validated_at)):""}</dd>`:""}</dl>
+      <div class="roles">${ROLES.map(r => `<label>${r.ico} ${esc(r.who)}${roleSelect(p, r)}</label>`).join("")}</div>
+      ${stepperHTML(p)}
+      ${valBox}
+      ${approvalsHTML(p)}
       ${p.notes?`<div class="sec"><h4>Consignes pour poster</h4><div class="notes">${esc(p.notes)}</div></div>`:""}
       ${gallery}
       ${link?`<div class="sec"><h4>Fichiers source</h4><a href="${esc(link)}" target="_blank" rel="noopener">Ouvrir le lien (Canva, Drive…)</a></div>`:""}
@@ -779,45 +915,54 @@ function openDetail(id, refresh){
         <div class="copyrow"><button class="btn turq" type="button" data-action="copy" data-id="${p.id}">Copier texte + hashtags</button>${p.hashtags&&p.caption?`<button class="btn small" type="button" data-action="copy-only" data-id="${p.id}">Texte seul</button><button class="btn small" type="button" data-action="copy-tags" data-id="${p.id}">Hashtags seuls</button>`:""}</div>`:`<p class="hint">Le texte n'est pas encore écrit.</p>`}</div>
       ${pfs.length?`<div class="sec"><h4>Publication</h4>${pubs}</div>`:""}
       <div class="sec"><h4>Échanges</h4><div class="comments">${cmts||`<p class="hint" style="margin:0">Une question, un souci pour poster ? Écris-le ici, tout le monde le verra.</p>`}</div>
-        <form class="addc" data-action="comment" data-id="${p.id}" style="margin-top:8px"><label class="sr" for="c-in">Message</label><input id="c-in" type="text" placeholder="Écrire un message…" autocomplete="off"><button class="btn small" type="submit">Envoyer</button></form></div>
+        <form class="addc" data-action="comment" data-id="${p.id}" style="margin-top:8px"><label class="sr" for="c-in">Message</label><input id="c-in" type="text" placeholder="Écrire un message… (tape @ pour taguer)" autocomplete="off"><button class="btn small" type="submit">Envoyer</button></form><div class="mention-sug" id="msug"></div></div>
     </div>
     <div class="m-foot"><button class="btn" type="button" data-action="edit" data-id="${p.id}">Modifier</button><button class="btn" type="button" data-action="duplicate" data-id="${p.id}">Dupliquer</button><span class="spacer"></span><button class="btn ghost danger" type="button" data-action="delete" data-id="${p.id}">Supprimer</button></div>
   </div>`;
   if(refresh){
     const o=$("#ov1"); const active=document.activeElement; if(active && o.contains(active) && (active.tagName==="INPUT"||active.tagName==="SELECT"||active.tagName==="VIDEO")) return;
+    if(!$("#ov2").hidden) return;
     if(o.querySelector("video:not([paused])")) { const v=[...o.querySelectorAll("video")].some(v=>!v.paused); if(v) return; }
     const sc=o.scrollTop; o.innerHTML=html; o.scrollTop=sc; return;
   }
   openOv(1, html, "detail");
+  readForPost(id);
 }
 
 /* ---- Éditeur ---- */
 let ED = null;
-function openEditor(id, presetDate, duplicateFrom){
+function openEditor(id, presetDate, duplicateFrom, preset){
   const src = id ? getPost(id) : duplicateFrom ? getPost(duplicateFrom) : null;
   ED = { id: id || null, media: id && src ? media(src).map(m=>({...m})) : [], uploaded: [], uploading: 0, saved:false };
   // Pour une copie, on ne partage pas les fichiers : on repart sans visuels (évite qu'une suppression efface ceux de l'original)
-  const p = src || {status:"creation", platforms:["instagram","facebook"], format:"post", rubrique:"adoption", date:presetDate||"", time:"18:00"};
+  const p = src || preset || {status:"creation", platforms:["instagram","facebook"], format:"post", rubrique:"adoption", date:presetDate||"", time:"18:00", visual_by:S.me||"", wording_by:S.me||""};
+  ED.event_key = preset?.event_key || (id ? src?.event_key : null) || null;
   const title = id ? "Modifier le post" : duplicateFrom ? "Copie du post" : "Nouveau post";
   const rubChips = Object.entries(RUB).map(([k,r]) => `<label class="chip" style="--c:${r.c};--cw:${tint(r.c,.18)}"><input type="radio" name="rub" value="${k}" ${p.rubrique===k?"checked":""}><span><i style="width:10px;height:10px;border-radius:50%;background:${r.c};display:inline-block"></i>${esc(r.label)}</span></label>`).join("");
-  const stChips = ["idee","creation","pret"].map(k => `<label class="chip"><input type="radio" name="st" value="${k}" ${(effStatus(p)===k || (effStatus(p)==="publie" && k==="pret"))?"checked":""}><span>${STATUS[k]}</span></label>`).join("");
+  const es = effStatus(p), alreadyOk = ["pret","programme","publie"].includes(es);
+  const hasValidation = cheffes().length || (S.reglages?.validatrices||[]).length;
+  const lockPret = hasValidation && !meM()?.is_cheffe && !alreadyOk;
+  const stChips = ["idee","creation","validation","pret"].map(k => `<label class="chip"><input type="radio" name="st" value="${k}" ${(es===k || (alreadyOk && k==="pret"))?"checked":""} ${k==="pret"&&lockPret?"disabled":""}><span>${k==="validation"?"À faire valider":STATUS[k]}</span></label>`).join("");
   const pfChips = Object.keys(PF).map(k => `<label class="chip"><input type="checkbox" name="pf" value="${k}" ${platforms(p).includes(k)?"checked":""}><span>${pfIcon(k)}${PF[k].label}</span></label>`).join("");
   openOv(1, `<form class="modal" role="dialog" aria-modal="true" aria-labelledby="e-t" id="editor">
     <div class="m-head"><h2 id="e-t">${title}</h2><button class="x" type="button" data-action="close1" aria-label="Fermer">×</button></div>
     <div class="m-body">
       <label class="f">Titre interne <span class="h">Pour s'y retrouver dans l'équipe, il n'est pas publié.</span><input type="text" id="f-title" value="${esc(duplicateFrom?(p.title||"")+" (copie)":p.title||"")}" placeholder="Ex. Portrait de Caramel, à l'adoption" autofocus required></label>
-      <div class="sec"><h4>Où en est-il ?</h4><div class="chips">${stChips}</div><p class="hint" style="margin:6px 0 0">Seuls les posts « Prêt à poster » apparaissent dans la liste « À poster ».</p></div>
+      <div class="sec"><h4>Où en est-il ?</h4><div class="chips">${stChips}</div><p class="hint" style="margin:6px 0 0">Quand le visuel et le texte sont prêts, choisis « À faire valider » : tu pourras envoyer le lien de validation dans Messenger${(S.reglages?.validatrices||[]).length?" à "+esc(S.reglages.validatrices.join(" et ")):""}.</p></div>
       <div class="sec"><h4>Rubrique</h4><div class="chips">${rubChips}</div></div>
       <div class="row2"><div class="sec"><h4>Réseaux</h4><div class="chips">${pfChips}</div></div>
         <label class="f">Format<select id="f-format">${Object.entries(FORMATS).map(([k,l])=>`<option value="${k}" ${p.format===k?"selected":""}>${l}</option>`).join("")}</select></label></div>
       <div class="row3"><label class="f">Date<input type="date" id="f-date" value="${esc(duplicateFrom?"":p.date||"")}"></label><label class="f">Heure conseillée<input type="time" id="f-time" value="${esc(p.time||"")}"></label>
-        <label class="f">Qui poste ?<select id="f-assignee"><option value="">À répartir</option>${S.team.map(m=>`<option value="${esc(m.id)}" ${m.id===p.assignee?"selected":""}>${esc(m.name)}</option>`).join("")}</select></label></div>
+        <span></span></div>
+      <div class="sec"><h4>Qui fait quoi ?</h4><div class="row3">${ROLES.map(r => `<label class="f">${r.ico} ${esc(r.who)}<select id="f-${r.k}"><option value="">À répartir</option>${S.team.map(m=>`<option value="${esc(m.id)}" ${m.id===p[r.k]?"selected":""}>${esc(m.name)}</option>`).join("")}</select></label>`).join("")}</div></div>
       <div class="sec"><h4>Visuels</h4>
         <div class="drop" id="drop"><p style="margin:0 0 8px">Glisse tes images ou vidéos ici</p><label class="btn small" for="f-files">Choisir des fichiers</label><input type="file" id="f-files" accept="image/*,video/mp4,video/webm,video/quicktime" multiple class="sr"><p class="hint" style="margin:8px 0 0">Les photos sont allégées automatiquement. Vidéos : 50 Mo maximum (sinon, mets un lien Drive). L'ordre ici = l'ordre du carrousel.</p></div>
         <div class="thumbs" id="thumbs"></div></div>
       <label class="f">Lien Canva / Drive <span class="h">Facultatif : pour retrouver les fichiers sources.</span><input type="url" id="f-link" value="${esc(p.link||"")}" placeholder="https://"></label>
       <label class="f">Texte du post<textarea id="f-caption" placeholder="Nous… (on parle des chats, on remercie, on donne des nouvelles concrètes)">${esc(p.caption||"")}</textarea><span class="counter" id="f-count"></span></label>
+      ${favChipsHTML("texte","#f-caption")}
       <label class="f">Hashtags<input type="text" id="f-hashtags" value="${esc(p.hashtags||"")}" placeholder="#adoption #chat #hautegaronne #refuge"></label>
+      ${favChipsHTML("hashtags","#f-hashtags")}
       <label class="f">Consignes pour poster <span class="h">Ex. identifier la mairie, mettre aussi en story, ne pas poster avant 18h.</span><textarea id="f-notes" style="min-height:80px">${esc(p.notes||"")}</textarea></label>
     </div>
     <div class="m-foot"><span class="spacer"></span><button class="btn" type="button" data-action="close1">Annuler</button><button class="btn primary" type="submit" id="f-save">Enregistrer</button></div>
@@ -890,10 +1035,17 @@ async function saveEditor(){
   const data = {
     title, status, platforms:pfs,
     rubrique: document.querySelector('input[name=rub]:checked')?.value || "autre",
-    format: v("#f-format"), date: v("#f-date") || null, time: v("#f-time") || null, assignee: v("#f-assignee") || null,
+    format: v("#f-format"), date: v("#f-date") || null, time: v("#f-time") || null,
+    assignee: v("#f-assignee") || null, visual_by: v("#f-visual_by") || null, wording_by: v("#f-wording_by") || null,
     caption: $("#f-caption").value.replace(/\s+$/,""), hashtags: v("#f-hashtags"), notes: v("#f-notes"), link: v("#f-link"),
     media: ED.media, published
   };
+  if(ED.event_key) data.event_key = ED.event_key;
+  const wantsValidation = status==="validation" && old?.status!=="validation";
+  if(wantsValidation){ data.status = old?.status && old.status!=="validation" ? old.status : "creation"; status = data.status; }
+  if(!old || old.date!==(data.date||"") || (old.time||"")!==(data.time||"")){ data.reminder_sent_at = null; data.late_sent_at = null; }
+  const becameReady = status==="pret" && (!old || !["pret","publie"].includes(old.status));
+  if(becameReady && meM()?.is_cheffe){ data.validated_by = S.me; data.validated_at = new Date().toISOString(); }
   $("#f-save").disabled = true;
   let id = ED.id;
   const res = id ? await S.sb.from("posts").update(data).eq("id", id) : await S.sb.from("posts").insert({...data, created_by:meM()?S.me:null}).select("id").single();
@@ -904,14 +1056,18 @@ async function saveEditor(){
   const removedNew = ED.uploaded.filter(pth => !ED.media.some(m=>m.path===pth));
   removeFiles(removedNew).catch(()=>{});
   ED.saved = true;
+  const postInfo = {id, title, date:data.date||"", time:data.time||""};
+  if(becameReady && meM()?.is_cheffe) await notify([old?.created_by, data.assignee], {post:postInfo, kind:"feu-vert", title:`✅ Feu vert pour « ${title} »`, body:`${myName()} a validé le post. Il est prêt à être posté${whenTxt(postInfo)}.`});
+  for(const r of ROLES){ const nv = data[r.k]; if(nv && nv!==(old?.[r.k]||null)) await notify([nv], {post:postInfo, kind:"assign", title:`${ROLE_MSG[r.k][0]} ${myName()} te confie ${ROLE_MSG[r.k][1]}`, body:`« ${title} »${whenTxt(postInfo)}.`}); }
   toast(ED.id ? "Modifications enregistrées." : status==="pret" ? "Post prêt : il apparaît dans « À poster »." : "Post ajouté à l'atelier.");
   await loadPosts().catch(()=>{});
   $("#ov1").dataset.kind = ""; ED = null;
   render(); openDetail(id);
+  if(wantsValidation) await sendForValidation(id);
 }
 
 /* ---- Qui es-tu ? ---- */
-function setMe(id){ S.me=id; try{ localStorage.setItem("chamania-me", id); }catch(e){} render(); }
+function setMe(id){ S.me=id; try{ localStorage.setItem("chamania-me", id); }catch(e){} render(); loadNotifs().then(render).catch(()=>{}); syncPush(); }
 function openWhoAmI(after){
   const list = S.team.map(m => `<button type="button" data-pick="${esc(m.id)}"${m.id===S.me?' style="border-color:var(--rose);background:var(--rose-wash)"':""}>${avatarHTML(m.id,36)}${esc(m.name)}</button>`).join("");
   openOv(2, `<div class="modal narrow" role="dialog" aria-modal="true" aria-labelledby="w-t"><div class="m-head"><h2 id="w-t">Qui es-tu ?</h2><button class="x" type="button" data-action="close2" aria-label="Fermer">×</button></div>
@@ -937,9 +1093,11 @@ function openTeam(){
     $("#t-rows").innerHTML = draft.map((m,i) => `<div class="teamrow"><span class="avatar" style="background:${esc(m.color)}">${esc(initials(m.name))}</span>
       <label class="sr" for="tn-${i}">Prénom</label><input class="inp" type="text" id="tn-${i}" data-i="${i}" value="${esc(m.name)}">
       <div class="swatches">${MEMBER_COLORS.map(c=>`<button type="button" style="background:${c}" aria-label="Couleur" aria-pressed="${c===m.color}" data-i="${i}" data-c="${c}"></button>`).join("")}</div>
+      <label class="toggle" style="font-size:14px"><input type="checkbox" data-chef="${i}" ${m.is_cheffe?"checked":""}> Cheffe (valide les posts)</label>
       <button class="x" type="button" data-rm="${i}" aria-label="Retirer ${esc(m.name)}">×</button></div>`).join("") || `<p class="hint">Personne pour l'instant.</p>`;
     $("#t-rows").querySelectorAll("input").forEach(inp => inp.oninput = () => { draft[+inp.dataset.i].name = inp.value; });
     $("#t-rows").querySelectorAll("[data-c]").forEach(b => b.onclick = () => { draft[+b.dataset.i].color = b.dataset.c; draw(); });
+    $("#t-rows").querySelectorAll("[data-chef]").forEach(c => c.onchange = () => { draft[+c.dataset.chef].is_cheffe = c.checked; });
     $("#t-rows").querySelectorAll("[data-rm]").forEach(b => b.onclick = () => { const [m] = draft.splice(+b.dataset.rm,1); if(m.id) removed.push(m.id); draw(); });
   };
   openOv(1, `<div class="modal narrow" role="dialog" aria-modal="true" aria-labelledby="t-t"><div class="m-head"><h2 id="t-t">L'équipe réseaux</h2><button class="x" type="button" data-action="close1" aria-label="Fermer">×</button></div>
@@ -948,7 +1106,7 @@ function openTeam(){
     <div class="sec" style="margin-top:6px"><h4>Code d'accès de l'équipe</h4>
       <div class="addc"><label class="sr" for="t-pin">Nouveau code</label><input id="t-pin" type="password" inputmode="numeric" autocomplete="new-password" placeholder="Nouveau code (6 chiffres)" maxlength="12"><button class="btn small" type="button" id="t-pin-btn">Changer le code</button></div>
       <p class="hint" style="margin:6px 0 0">Le nouveau code vaut pour toute l'équipe : pense à le leur donner.</p></div></div>
-    <div class="m-foot"><span class="spacer"></span><button class="btn" type="button" data-action="close1">Annuler</button><button class="btn primary" type="button" id="t-save">Enregistrer</button></div></div>`, "team");
+    <div class="m-foot"><button class="btn ghost" type="button" data-action="settings">⚙️ Réglages</button><span class="spacer"></span><button class="btn" type="button" data-action="close1">Annuler</button><button class="btn primary" type="button" id="t-save">Enregistrer</button></div></div>`, "team");
   draw();
   $("#t-add").onclick = () => { draft.push({id:null, name:"", color:MEMBER_COLORS[draft.length % MEMBER_COLORS.length]}); draw(); $("#tn-"+(draft.length-1)).focus(); };
   $("#t-pin-btn").onclick = () => {
@@ -964,16 +1122,514 @@ function openTeam(){
     for(const m of draft){
       const name = m.name.trim(); if(!name) continue;
       const old = S.team.find(x => x.id===m.id);
-      if(!m.id){ if(!await run(S.sb.from("membres").insert({name, color:m.color}))) return; }
-      else if(old && (old.name!==name || old.color!==m.color)){ if(!await run(S.sb.from("membres").update({name, color:m.color}).eq("id", m.id))) return; }
+      if(!m.id){ if(!await run(S.sb.from("membres").insert({name, color:m.color, is_cheffe:!!m.is_cheffe}))) return; }
+      else if(old && (old.name!==name || old.color!==m.color || old.is_cheffe!==!!m.is_cheffe)){ if(!await run(S.sb.from("membres").update({name, color:m.color, is_cheffe:!!m.is_cheffe}).eq("id", m.id))) return; }
     }
     for(const id of removed){ if(!await run(S.sb.from("membres").delete().eq("id", id))) return; if(id===S.me){ S.me=null; try{ localStorage.removeItem("chamania-me"); }catch(e){} } }
     await loadTeam().catch(()=>{}); closeOv(1); render(); toast("Équipe enregistrée.");
   };
 }
 
+/* ================== Notifications, validation, tags ================== */
+const cheffes = () => S.team.filter(m => m.is_cheffe);
+const myName = () => meM()?.name || "Quelqu'un";
+const norm = s => String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
+async function loadNotifs(){
+  if(!S.me || !member(S.me)){ S.notifs = []; return; }
+  const {data, error} = await S.sb.from("notifications").select("*").eq("membre_id", S.me).order("created_at", {ascending:false}).limit(50);
+  if(error) throw error; S.notifs = data;
+}
+async function notify(ids, {post, kind, title, body}){
+  const rows = [...new Set(ids)].filter(id => id && id!==S.me && member(id))
+    .map(id => ({membre_id:id, post_id:post?.id||null, kind:kind||"info", title, body:body||"", created_by:meM()?S.me:null}));
+  if(!rows.length) return;
+  const {error} = await S.sb.from("notifications").insert(rows);
+  if(error) console.error(error);
+}
+const whenTxt = p => p.date ? ` pour ${p.date===today()?"aujourd'hui":fmtShort(p.date)}${p.time?" à "+fmtTime(p.time):""}` : "";
+
+async function requestValidation(id){
+  const p = getPost(id); if(!p) return;
+  if(!meM()){ openWhoAmI(() => requestValidation(id)); return; }
+  if(!cheffes().length){ toast("Personne n'est encore cheffe : choisis-la dans « Équipe »."); return; }
+  await patchPost(id, {status:"validation"}, `Envoyé à ${cheffes().map(m=>m.name).join(" et ")} pour validation.`);
+  await notify(cheffes().map(m=>m.id), {post:p, kind:"validation", title:"👀 Un post attend ton feu vert", body:`${myName()} propose « ${p.title} »${whenTxt(p)}.`});
+}
+async function approvePost(id){
+  const p = getPost(id); if(!p) return;
+  if(!meM()){ openWhoAmI(() => approvePost(id)); return; }
+  const appr = [...(Array.isArray(p.approvals)?p.approvals:[]), {name:myName(), ok:true, comment:"", at:new Date().toISOString(), source:"appli"}];
+  await patchPost(id, {status:"pret", validated_by:S.me, validated_name:myName(), validated_at:new Date().toISOString(), approvals:appr}, "Feu vert donné ✓ Le post est prêt à être posté.");
+  await notify([p.created_by, p.assignee, p.wording_by], {post:p, kind:"feu-vert", title:`✅ Feu vert pour « ${p.title} »`, body:`${myName()} a validé le post. Il est prêt à être posté${whenTxt(p)}.`});
+}
+function openRevise(id){
+  const p = getPost(id); if(!p) return;
+  openOv(2, `<form class="modal narrow" role="dialog" aria-modal="true" aria-labelledby="rv-t" id="rv-form"><div class="m-head"><h2 id="rv-t">Qu'est-ce qu'il faut revoir ?</h2><button class="x" type="button" data-action="close2" aria-label="Fermer">×</button></div>
+    <div class="m-body"><label class="f"><span class="sr">Ce qu'il faut changer</span><textarea id="rv-text" style="min-height:120px" placeholder="Ex. changer la photo, raccourcir le texte, ajouter le lien HelloAsso…" autofocus required></textarea></label>
+    <p class="hint" style="margin:0">Le post repasse « En création » et ton message est ajouté aux échanges.</p></div>
+    <div class="m-foot"><span class="spacer"></span><button class="btn" type="button" data-action="close2">Annuler</button><button class="btn primary" type="submit">Envoyer</button></div></form>`);
+  $("#rv-form").onsubmit = async e => {
+    e.preventDefault(); const text = $("#rv-text").value.trim(); if(!text) return;
+    closeOv(2);
+    const appr = [...(Array.isArray(p.approvals)?p.approvals:[]), {name:myName(), ok:false, comment:text, at:new Date().toISOString(), source:"appli"}];
+    await patchPost(id, {status:"creation", approvals:appr}, "Demande de modifications envoyée.");
+    await run(S.sb.from("comments").insert({post_id:id, text:"🔁 À revoir : " + text, author:meM()?S.me:null}));
+    await notify([p.created_by, p.visual_by, p.wording_by, p.assignee], {post:p, kind:"a-revoir", title:`🔁 À revoir : « ${p.title} »`, body:`${myName()} : ${text}`});
+    refreshSoon("comments");
+  };
+}
+async function markScheduled(id, pfs){
+  const p = getPost(id); if(!p) return;
+  if(!meM()){ openWhoAmI(() => markScheduled(id, pfs)); return; }
+  if(!p.date){ toast("Ajoute d'abord la date et l'heure du post (bouton « Modifier »)."); return; }
+  const at = new Date(`${p.date}T${(p.time||"12:00").slice(0,5)}:00`);
+  if(at <= new Date()){ toast("L'heure prévue est déjà passée : utilise plutôt « J'ai publié »."); return; }
+  const todo = (pfs || platforms(p)).filter(k => !handled(p,k));
+  p.published = {...p.published}; todo.forEach(k => p.published[k] = {at:at.toISOString(), by:S.me, scheduled:true}); render();
+  for(const k of todo) await run(S.sb.rpc("set_published", {p_post:id, p_platform:k, p_by:S.me, p_at:at.toISOString(), p_scheduled:true}));
+  toast(`Programmé ✓ Il passera tout seul en « Publié » le ${fmtShort(p.date)} à ${fmtTime(p.time||"12:00")}.`);
+  refreshSoon("posts");
+}
+function mentionedIds(text){
+  const t = norm(text);
+  return S.team.filter(m => t.includes("@" + norm(m.name))).map(m => m.id);
+}
+function commentHTML(text){
+  let h = esc(text);
+  [...S.team].sort((a,b) => b.name.length - a.name.length).forEach(m => {
+    const re = new RegExp("@" + esc(m.name).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi");
+    h = h.replace(re, s => `<b class="mention">${s}</b>`);
+  });
+  return h;
+}
+function mentionSuggest(inp){
+  const box = $("#msug"); if(!box) return;
+  const before = inp.value.slice(0, inp.selectionStart ?? inp.value.length);
+  const m = before.match(/@([^\s@]*)$/);
+  if(!m){ box.innerHTML = ""; return; }
+  const q = norm(m[1]);
+  const list = S.team.filter(x => norm(x.name).startsWith(q)).slice(0,6);
+  box.innerHTML = list.map(x => `<button type="button" data-mention="${esc(x.name)}">${avatarHTML(x.id,20)} ${esc(x.name)}</button>`).join("");
+  box.querySelectorAll("[data-mention]").forEach(b => b.onmousedown = e => {
+    e.preventDefault();
+    const pos = inp.selectionStart ?? inp.value.length;
+    const start = before.length - m[0].length;
+    inp.value = inp.value.slice(0, start) + "@" + b.dataset.mention + " " + inp.value.slice(pos);
+    const c = start + b.dataset.mention.length + 2; inp.setSelectionRange(c, c); inp.focus(); box.innerHTML = "";
+  });
+}
+document.addEventListener("input", e => { if(e.target.id === "c-in") mentionSuggest(e.target); });
+
+/* ---- Cloche ---- */
+function renderBell(){
+  const n = (S.notifs||[]).filter(x => !x.read_at).length, b = $("#bell-n");
+  if(!b) return; b.hidden = !n; b.textContent = n > 9 ? "9+" : n;
+}
+async function markRead(ids){
+  ids = ids.filter(Boolean); if(!ids.length) return;
+  const now = new Date().toISOString();
+  (S.notifs||[]).forEach(n => { if(ids.includes(n.id)) n.read_at = now; }); renderBell();
+  await S.sb.from("notifications").update({read_at:now}).in("id", ids);
+}
+function readForPost(postId){ markRead((S.notifs||[]).filter(n => n.post_id===postId && !n.read_at).map(n=>n.id)); }
+async function openNotifs(){
+  if(!meM()){ openWhoAmI(openNotifs); return; }
+  const st = await pushState();
+  const pushBox = {
+    on: `<div class="valbox ok"><p>🔔 Les notifications sont activées sur cet appareil.</p><button class="btn small ghost" type="button" id="p-test">M'envoyer un test</button></div>`,
+    off: `<div class="valbox"><p>Reçois une notification quand on te tague, quand c'est l'heure de poster ou quand un post attend la validation.</p><button class="btn small primary" type="button" id="p-on">Activer sur ce téléphone</button></div>`,
+    ios: `<div class="valbox warn"><p><b>Sur iPhone, une étape d'abord :</b> touche <b>Partager</b> <span aria-hidden="true">⎋</span> en bas de Safari, puis <b>« Sur l'écran d'accueil »</b>. Ouvre ensuite l'appli depuis la nouvelle icône Cha'mania et reviens ici.</p></div>`,
+    denied: `<div class="valbox warn"><p>Les notifications sont bloquées pour ce site. Autorise-les dans les réglages du navigateur (ou du téléphone › Notifications), puis recharge la page.</p></div>`,
+    unsupported: `<div class="valbox warn"><p>Ce navigateur ne gère pas les notifications. Sur Android, utilise Chrome ; sur iPhone, ajoute l'appli à l'écran d'accueil (iOS 16.4 ou plus récent).</p></div>`,
+    nokey: `<div class="valbox warn"><p>Les notifications ne sont pas encore configurées (clé VAPID_PUBLIC_KEY manquante dans config.js).</p></div>`
+  }[st];
+  const items = (S.notifs||[]).map(n => `<button type="button" class="nitem${n.read_at?"":" unread"}" data-nid="${esc(n.id)}" data-post="${esc(n.post_id||"")}">${avatarHTML(n.created_by,32)}<span><b>${esc(n.title)}</b>${n.body?`<span class="nb">${esc(n.body)}</span>`:""}<small>${esc(fmtStamp(n.created_at))}</small></span></button>`).join("");
+  openOv(2, `<div class="modal narrow" role="dialog" aria-modal="true" aria-labelledby="n-t"><div class="m-head"><h2 id="n-t">Notifications</h2><button class="x" type="button" data-action="close2" aria-label="Fermer">×</button></div>
+    <div class="m-body">${pushBox}<div class="nlist">${items || `<p class="hint" style="margin:0">Rien pour l'instant. Tu seras prévenue ici quand on te tague, quand un post t'est confié ou quand c'est l'heure de poster.</p>`}</div></div>
+    ${items?`<div class="m-foot"><span class="spacer"></span><button class="btn small ghost" type="button" id="n-all">Tout marquer comme lu</button></div>`:""}</div>`);
+  $("#ov2").querySelectorAll("[data-nid]").forEach(b => b.onclick = () => { markRead([b.dataset.nid]); closeOv(2); if(b.dataset.post && getPost(b.dataset.post)) openDetail(b.dataset.post); });
+  const all = $("#n-all"); if(all) all.onclick = () => { markRead((S.notifs||[]).filter(n=>!n.read_at).map(n=>n.id)); closeOv(2); };
+  const on = $("#p-on"); if(on) on.onclick = async () => { on.disabled = true; on.textContent = "Activation…"; const ok = await enablePush(); closeOv(2); if(ok) toast("C'est activé ! Tu recevras les notifications sur cet appareil."); };
+  const test = $("#p-test"); if(test) test.onclick = async () => {
+    const {error} = await S.sb.from("notifications").insert({membre_id:S.me, kind:"test", title:"🐾 Test réussi !", body:"Les notifications Cha'mania arrivent bien sur cet appareil.", created_by:S.me});
+    closeOv(2); toast(error ? failMsg(error) : "Test envoyé : il arrive dans les 10 minutes environ.");
+  };
+}
+
+/* ---- Notifications push (téléphone) ---- */
+const isIOS = () => /iPhone|iPad|iPod/i.test(navigator.userAgent);
+const isStandalone = () => window.matchMedia?.("(display-mode: standalone)").matches || navigator.standalone === true;
+function b64ToBytes(s){ const pad = "=".repeat((4 - s.length % 4) % 4); const b = atob((s + pad).replace(/-/g,"+").replace(/_/g,"/")); return Uint8Array.from(b, c => c.charCodeAt(0)); }
+async function pushState(){
+  if(!CFG.VAPID_PUBLIC_KEY || /VOTRE/.test(CFG.VAPID_PUBLIC_KEY)) return "nokey";
+  if(isIOS() && !isStandalone()) return "ios";
+  if(!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) return "unsupported";
+  if(Notification.permission === "denied") return "denied";
+  try{ const reg = await navigator.serviceWorker.getRegistration(); const sub = reg && await reg.pushManager.getSubscription(); if(sub && Notification.permission==="granted") return "on"; }catch(e){}
+  return "off";
+}
+async function saveSub(sub){
+  if(!sub || !meM()) return;
+  const j = sub.toJSON();
+  await S.sb.from("push_subscriptions").upsert({endpoint:j.endpoint, p256dh:j.keys.p256dh, auth:j.keys.auth, membre_id:S.me, user_agent:navigator.userAgent.slice(0,200), updated_at:new Date().toISOString()}, {onConflict:"endpoint"});
+}
+async function enablePush(){
+  try{
+    const perm = await Notification.requestPermission();
+    if(perm !== "granted"){ toast("Notifications refusées. Tu pourras les autoriser plus tard dans les réglages."); return false; }
+    const reg = await navigator.serviceWorker.register("sw.js"); await navigator.serviceWorker.ready;
+    let sub = await reg.pushManager.getSubscription();
+    if(!sub) sub = await reg.pushManager.subscribe({userVisibleOnly:true, applicationServerKey:b64ToBytes(CFG.VAPID_PUBLIC_KEY)});
+    await saveSub(sub); return true;
+  }catch(e){ console.error(e); toast("L'activation n'a pas marché : " + (e.message||e)); return false; }
+}
+async function syncPush(){
+  try{
+    if(!("serviceWorker" in navigator) || !meM()) return;
+    const reg = await navigator.serviceWorker.getRegistration(); if(!reg) return;
+    const sub = await reg.pushManager?.getSubscription(); if(sub && Notification.permission==="granted") await saveSub(sub);
+  }catch(e){ console.error(e); }
+}
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.register("sw.js").catch(()=>{});
+  navigator.serviceWorker.addEventListener("message", e => {
+    if(e.data?.type==="open"){ const h = new URL(e.data.url).hash; if(h) { location.hash = h; handleHash(); } }
+  });
+}
+
+/* ---- Liens directs vers un post (#post-…) ---- */
+function handleHash(){
+  const h = location.hash.slice(1);
+  if(h.startsWith("post-")){ S.pendingPost = h.slice(5); openPending(); return true; }
+  return false;
+}
+function openPending(){
+  if(!S.pendingPost || !S.loaded) return;
+  const id = S.pendingPost; S.pendingPost = null;
+  try{ history.replaceState(null, "", "#" + S.view); }catch(e){}
+  if(getPost(id)){ render(); openDetail(id); readForPost(id); }
+}
+
+/* ================== V3 : rôles, to-do, validation par lien, marronnier, suggestions ================== */
+const ROLES = [
+  {k:"visual_by",  ico:"🎨", label:"Visuel",   who:"Qui fait le visuel ?"},
+  {k:"wording_by", ico:"✍️", label:"Texte",    who:"Qui écrit le texte ?"},
+  {k:"assignee",   ico:"📣", label:"Publication", who:"Qui poste ?"}
+];
+// Modèles de posts (début de texte dans le ton « nous »)
+const TEMPLATES = [
+  {key:"adoption", titre:"Portrait adoption", rubrique:"adoption", format:"carrousel", caption:"🐾 [Prénom] attend sa famille !\n\n[Son caractère en 2-3 phrases : ce qu'il/elle aime, ses petites habitudes.]\n\nIl/Elle s'entend avec : [chats / chiens / enfants].\nIl/Elle sera heureux·se : [en appartement / avec un jardin…].\n\n💌 Vous pensez être la bonne famille ? Écrivez-nous en message privé."},
+  {key:"merci", titre:"Merci aux donateurs", rubrique:"merci", format:"post", caption:"💗 MERCI !\n\nCette semaine, grâce à vous, [ce que les dons ont permis : croquettes, soins, avancée du chantier…].\n\nChaque don compte, même 5 € : ensemble, nous avançons pour nos chats.\n\nLe lien de notre cagnotte est dans notre bio."},
+  {key:"chantier", titre:"Point chantier du refuge", rubrique:"refuge", format:"carrousel", caption:"🏗️ Des nouvelles du refuge !\n\n[Ce qui a avancé, avec 1 ou 2 photos.]\n\nProchaine étape : [prochaine étape].\nCe qu'il nous manque : [besoin concret].\n\nMerci de nous suivre dans cette aventure 💗"},
+  {key:"coulisses", titre:"Coulisses d'une famille d'accueil", rubrique:"vie", format:"post", caption:"🏡 Dans les coulisses de Cha'mania\n\nAujourd'hui, [prénom de la FA] nous ouvre les portes de sa maison : [anecdote du quotidien avec les chats accueillis].\n\nVous aussi, vous aimeriez devenir famille d'accueil ? Écrivez-nous !"},
+  {key:"conseil", titre:"Conseil santé / bien-être", rubrique:"conseil", format:"carrousel", caption:"💡 Le conseil de la semaine\n\n[Le conseil en une phrase claire.]\n\nPourquoi c'est important : [explication courte].\n\n👉 Enregistrez ce post pour le retrouver !"},
+  {key:"nouvelle-vie", titre:"Nouvelle vie (après adoption)", rubrique:"adoption", format:"post", caption:"🏠 Des nouvelles de [Prénom] !\n\nAdopté·e en [mois], [Prénom] [ce que devient le chat dans sa nouvelle famille].\n\nMerci à [famille] de nous avoir envoyé ces photos 💗 C'est pour ces moments que nous faisons tout ça."},
+  {key:"cagnotte", titre:"Rappel cagnotte", rubrique:"dons", format:"post", caption:"🧱 Ensemble, construisons le refuge\n\nOù nous en sommes : [montant ou étape atteinte].\nCe que permet un don de 10 € : [exemple concret].\n\nChaque petit don compte. Le lien est dans notre bio 💗"},
+  {key:"benevoles", titre:"Appel aux bénévoles / FA", rubrique:"vie", format:"post", caption:"🙋 Nous avons besoin de vous !\n\nNous cherchons [familles d'accueil / bénévoles pour…].\n\nPas besoin d'être expert·e : [ce qu'il faut vraiment].\n\nIntéressé·e ? Écrivez-nous en message privé."},
+  {key:"quiz", titre:"Le saviez-vous ?", rubrique:"conseil", format:"carrousel", caption:"🤔 Le saviez-vous ?\n\n[Question ou fait étonnant sur les chats.]\n\nRéponse : [réponse + explication courte].\n\nDites-nous en commentaire si vous le saviez !"}
+];
+const tpl = k => TEMPLATES.find(t => t.key===k) || TEMPLATES[0];
+
+// Marronnier intégré (dates qui reviennent chaque année)
+function lastWeekdayOfMonth(y, m, wd){ const d = new Date(y, m+1, 0); while(d.getDay()!==wd) d.setDate(d.getDate()-1); return ymd(d); }
+function givingTuesday(y){ const d = new Date(y, 10, 1); let n=0; while(true){ if(d.getDay()===4 && ++n===4) break; d.setDate(d.getDate()+1); } d.setDate(d.getDate()+5); return ymd(d); }
+function marronniers(y){
+  const f = (md) => `${y}-${md}`;
+  return [
+    {date:f("01-01"), titre:"Bonne année !", tpl:"merci", note:"Bilan de l'année et merci à toutes celles et ceux qui nous ont aidés."},
+    {date:f("02-14"), titre:"Saint-Valentin", tpl:"adoption", note:"« Le grand amour vous attend » : un portrait adoption tout doux."},
+    {date:lastWeekdayOfMonth(y,1,2), titre:"Journée mondiale de la stérilisation", tpl:"conseil", note:"Dernier mardi de février : pourquoi stériliser son chat."},
+    {date:f("03-15"), titre:"Début de la saison des chatons", tpl:"benevoles", note:"Les portées arrivent : besoin de familles d'accueil et rappel stérilisation."},
+    {date:f("06-15"), titre:"Avant l'été : non aux abandons", tpl:"conseil", note:"Préparer les vacances avec son chat, plutôt que de l'abandonner."},
+    {date:f("08-08"), titre:"Journée internationale du chat", tpl:"adoption", note:"Le grand jour des chats : mettre nos protégés à l'honneur."},
+    {date:f("08-17"), titre:"Journée du chat noir", tpl:"adoption", note:"Les chats noirs sont moins adoptés : un portrait pour casser les idées reçues."},
+    {date:f("09-01"), titre:"Rentrée", tpl:"benevoles", note:"Nouvelle saison : appel aux bénévoles et familles d'accueil."},
+    {date:f("10-04"), titre:"Journée mondiale des animaux", tpl:"coulisses", note:"Montrer le travail de l'asso au quotidien."},
+    {date:f("10-31"), titre:"Halloween : protégeons les chats noirs", tpl:"conseil", note:"Garder son chat noir à l'intérieur autour d'Halloween."},
+    {date:givingTuesday(y), titre:"Giving Tuesday (journée mondiale du don)", tpl:"cagnotte", note:"Le mardi après Thanksgiving : temps fort pour la cagnotte."},
+    {date:f("12-01"), titre:"Un chat n'est pas un cadeau de Noël", tpl:"conseil", note:"Adopter, c'est pour toute sa vie : sensibilisation avant les fêtes."},
+    {date:f("12-05"), titre:"Journée mondiale du bénévolat", tpl:"benevoles", note:"Remercier nos bénévoles et en recruter de nouveaux."},
+    {date:f("12-15"), titre:"Dons de fin d'année", tpl:"cagnotte", note:"Dernière ligne droite de l'année pour soutenir le refuge."}
+  ].map(e => ({...e, key:"m:"+e.titre+":"+y, builtin:true}));
+}
+function eventsBetween(from, to){
+  const y1 = +from.slice(0,4), y2 = +to.slice(0,4), out = [];
+  for(let y=y1; y<=y2; y++){
+    marronniers(y).forEach(e => out.push(e));
+    (S.events||[]).forEach(ev => {
+      const date = ev.recurrent ? `${y}-${String(ev.date).slice(5,10)}` : String(ev.date).slice(0,10);
+      if(ev.recurrent || +date.slice(0,4)===y) out.push({date, titre:ev.titre, note:ev.note||"", tpl:"coulisses", key:"e:"+ev.id+":"+y, id:ev.id, builtin:false});
+    });
+  }
+  const seen = new Set();
+  return out.filter(e => e.date>=from && e.date<=to && !seen.has(e.key) && seen.add(e.key)).sort((a,b) => a.date<b.date?-1:1);
+}
+const eventsOn = ds => eventsBetween(ds, ds);
+const postForEvent = key => S.posts.find(p => p.event_key===key);
+
+/* ---- Chargements supplémentaires ---- */
+async function loadExtras(){
+  const [r, e, f] = await Promise.all([
+    S.sb.from("reglages").select("*").eq("id",1).maybeSingle(),
+    S.sb.from("evenements").select("*").order("date"),
+    S.sb.from("favoris").select("*").order("created_at")
+  ]);
+  if(r.error || e.error || f.error){ console.warn("Mise à jour v3 de la base manquante ?", r.error||e.error||f.error); S.v3missing = true; }
+  S.reglages = r.data || {objectif_semaine:3, messenger_url:"https://www.facebook.com/messages/t/1520877360077467", validatrices:["Sibylle","Gaëlle"]};
+  S.events = e.data || []; S.favoris = f.data || [];
+}
+
+/* ---- Rythme de la semaine ---- */
+function weekBounds(ds){ const d = parseD(ds); const off = (d.getDay()+6)%7; d.setDate(d.getDate()-off); const mon = ymd(d); return [mon, addDays(mon,6)]; }
+function postsInWeek(mon){ const sun = addDays(mon,6); return S.posts.filter(p => p.date && p.date>=mon && p.date<=sun && effStatus(p)!=="idee"); }
+
+/* ---- Suggestions ---- */
+function suggestions(){
+  const t = today(), out = [], used = new Set();
+  // 1. Marronnier dans les 3 semaines
+  eventsBetween(t, addDays(t,21)).forEach(e => {
+    if(postForEvent(e.key)) return;
+    const days = Math.round((parseD(e.date)-parseD(t))/864e5);
+    out.push({ico:"🎉", titre:e.titre, txt:`${days===0?"Aujourd'hui":days===1?"Demain":"Dans "+days+" jours"} (${fmtShort(e.date)}). ${e.note}`, tpl:e.tpl, date:e.date, event_key:e.key, label:e.titre});
+    used.add(e.tpl);
+  });
+  // 2. Rythme : semaines sous l'objectif
+  const obj = S.reglages?.objectif_semaine || 3;
+  [0,1].forEach(w => {
+    const [mon] = weekBounds(addDays(t, w*7)); const n = postsInWeek(mon).length;
+    if(n < obj){
+      let day = mon > t ? mon : addDays(t,1);
+      const taken = new Set(S.posts.map(p => p.date));
+      for(let i=0;i<7 && taken.has(day);i++) day = addDays(day,1);
+      const rubLast = k => S.posts.filter(p => p.rubrique===k && p.date).map(p=>p.date).sort().pop() || "0000";
+      const pick = ["merci","refuge","adoption","vie","conseil"].sort((a,b) => rubLast(a)<rubLast(b)?-1:1).map(k => TEMPLATES.find(x=>x.rubrique===k)).find(x => x && !used.has(x.key)) || TEMPLATES[0];
+      used.add(pick.key);
+      out.push({ico:"📅", titre:`${w===0?"Cette semaine":"Semaine prochaine"} : ${n}/${obj} posts prévus`, txt:`Idée : « ${pick.titre} » le ${fmtShort(day)}.`, tpl:pick.key, date:day});
+    }
+  });
+  // 3. Rubriques oubliées depuis 3 semaines
+  [["merci","Pas de « Merci ! » depuis 3 semaines : valoriser les petits dons donne envie de donner."],["refuge","Pas de nouvelles du chantier depuis 3 semaines : on montre l'avancée ?"],["adoption","Pas de portrait adoption depuis 3 semaines."]].forEach(([k,txt]) => {
+    const last = S.posts.filter(p => p.rubrique===k && p.date).map(p=>p.date).sort().pop();
+    const tp = TEMPLATES.find(x=>x.rubrique===k);
+    if((!last || last < addDays(t,-21)) && !used.has(tp.key)){ used.add(tp.key); out.push({ico:"💡", titre:tp.titre, txt, tpl:tp.key}); }
+  });
+  return out.slice(0,4);
+}
+function suggestionsHTML(){
+  const list = suggestions(); if(!list.length) return "";
+  S._sugg = list;
+  return `<section class="sugg"><div class="sugg-h"><h3>💡 Idées pour la suite</h3><button class="btn small ghost" type="button" data-action="templates">Tous les modèles</button></div>
+    <div class="sugg-list">${list.map((s,i) => `<div class="sugg-item"><span class="sugg-ico" aria-hidden="true">${s.ico}</span><div><b>${esc(s.titre)}</b><small>${esc(s.txt)}</small></div><button class="btn small turq" type="button" data-action="use-sugg" data-i="${i}">Créer</button></div>`).join("")}</div></section>`;
+}
+function createFromTemplate(key, extra){
+  const t = tpl(key);
+  openEditor(null, extra?.date||"", null, {title: extra?.label || t.titre, rubrique:t.rubrique, format:t.format, caption:t.caption, status:"idee", event_key: extra?.event_key||null, date: extra?.date||"", time:"18:00", platforms:["instagram","facebook"], visual_by:S.me||"", wording_by:S.me||""});
+}
+function openTemplates(){
+  openOv(2, `<div class="modal narrow" role="dialog" aria-modal="true" aria-labelledby="tp-t"><div class="m-head"><h2 id="tp-t">Modèles de posts</h2><button class="x" type="button" data-action="close2" aria-label="Fermer">×</button></div>
+    <div class="m-body"><p class="hint" style="margin:0">Chaque modèle crée un post avec un début de texte dans notre ton. Il n'y a plus qu'à compléter les [crochets].</p>
+    <div class="sugg-list">${TEMPLATES.map(t => `<div class="sugg-item"><span class="sugg-ico" aria-hidden="true" style="background:${tint(RUB[t.rubrique].c,.2)}">●</span><div><b>${esc(t.titre)}</b><small>${esc(RUB[t.rubrique].label)} · ${esc(FORMATS[t.format])}</small></div><button class="btn small turq" type="button" data-tpl="${t.key}">Utiliser</button></div>`).join("")}</div></div></div>`);
+  $("#ov2").querySelectorAll("[data-tpl]").forEach(b => b.onclick = () => { closeOv(2); createFromTemplate(b.dataset.tpl); });
+}
+
+/* ---- Rôles et étapes ---- */
+function roleSelect(p, r){
+  return `<select class="inp role-sel" data-action="role" data-id="${p.id}" data-role="${r.k}" aria-label="${esc(r.who)}"><option value="">—</option>${S.team.map(m=>`<option value="${esc(m.id)}" ${m.id===p[r.k]?"selected":""}>${esc(m.name)}</option>`).join("")}</select>`;
+}
+const ROLE_MSG = {visual_by:["🎨","le visuel"], wording_by:["✍️","le texte"], assignee:["📌","la publication"]};
+async function setRole(id, k, val){
+  const p = getPost(id); if(!p) return;
+  await patchPost(id, {[k]: val||null}, "C'est noté.");
+  if(val) await notify([val], {post:p, kind:"assign", title:`${ROLE_MSG[k][0]} ${myName()} te confie ${ROLE_MSG[k][1]}`, body:`« ${p.title} »${whenTxt(p)}.`});
+}
+async function visualDone(id){
+  const p = getPost(id); if(!p) return;
+  if(!meM()){ openWhoAmI(() => visualDone(id)); return; }
+  await patchPost(id, {visual_done_at:new Date().toISOString(), status: p.status==="idee" ? "creation" : p.status}, p.wording_by && p.wording_by!==S.me ? `Bravo ! ${member(p.wording_by)?.name||""} est prévenue pour le texte.` : "Visuel terminé ✓");
+  if(p.wording_by) await notify([p.wording_by], {post:p, kind:"etape", title:"🎨 Visuel prêt : à toi pour le texte !", body:`« ${p.title} »${whenTxt(p)}.`});
+}
+async function wordingDone(id){
+  const p = getPost(id); if(!p) return;
+  if(!meM()){ openWhoAmI(() => wordingDone(id)); return; }
+  await patchPost(id, {wording_done_at:new Date().toISOString(), status: p.status==="idee" ? "creation" : p.status}, "Texte terminé ✓ Il ne reste plus qu'à l'envoyer pour validation.");
+  if(p.created_by && p.created_by!==S.me) await notify([p.created_by], {post:p, kind:"etape", title:"✍️ Texte prêt", body:`« ${p.title} » : le visuel et le texte sont prêts pour la validation.`});
+}
+async function undoStep(id, k){ await patchPost(id, {[k]:null}); }
+function stepperHTML(p){
+  const s = effStatus(p);
+  const vDone = !!p.visual_done_at, wDone = !!p.wording_done_at;
+  const valDone = ["pret","programme","publie"].includes(s), pubDone = ["programme","publie"].includes(s);
+  const step = (ico, label, who, done, current, action) => `<div class="step${done?" done":""}${current?" current":""}"><span class="step-dot" aria-hidden="true">${done?"✓":ico}</span><div class="step-b"><b>${label}</b>${who}${action||""}</div></div>`;
+  const whoTxt = k => p[k] ? `<small>${esc(member(p[k])?.name||"?")}</small>` : `<small class="hint">personne</small>`;
+  const prep = ["idee","creation"].includes(s);
+  return `<div class="stepper">
+    ${step("🎨","Visuel", whoTxt("visual_by"), vDone, prep && !vDone,
+       prep ? (vDone ? `<button class="linkbtn" type="button" data-action="undo-step" data-id="${p.id}" data-k="visual_done_at">annuler</button>` : `<button class="btn small turq" type="button" data-action="visual-done" data-id="${p.id}">Visuel terminé</button>`) : "")}
+    ${step("✍️","Texte", whoTxt("wording_by"), wDone, prep && vDone && !wDone,
+       prep ? (wDone ? `<button class="linkbtn" type="button" data-action="undo-step" data-id="${p.id}" data-k="wording_done_at">annuler</button>` : `<button class="btn small turq" type="button" data-action="wording-done" data-id="${p.id}">Texte terminé</button>`) : "")}
+    ${step("👀","Validation", `<small>${valDone ? "✓ "+esc(p.validated_name || member(p.validated_by)?.name || "validé") : s==="validation" ? "en attente" : esc((S.reglages?.validatrices||[]).join(" ou "))}</small>`, valDone, s==="validation" || (prep && vDone && wDone),
+       prep ? `<button class="btn small primary" type="button" data-action="send-validation" data-id="${p.id}">Envoyer pour validation</button>` : s==="validation" ? `<button class="btn small" type="button" data-action="share-validation" data-id="${p.id}">Renvoyer le lien</button>` : "")}
+    ${step("📣","Publication", whoTxt("assignee"), pubDone, s==="pret")}
+  </div>`;
+}
+function approvalsHTML(p){
+  const list = Array.isArray(p.approvals) ? p.approvals : [];
+  if(!list.length) return "";
+  return `<div class="approvals">${list.map(a => `<div class="appr ${a.ok?"ok":"ko"}">${a.ok?"✅":"🔁"} <b>${esc(a.name||"?")}</b> ${a.ok?"a validé":"demande des modifs"}${a.comment?` : « ${esc(a.comment)} »`:""} <small>${esc(fmtStamp(a.at))}${a.source==="lien"?" · via le lien":""}</small></div>`).join("")}</div>`;
+}
+
+/* ---- Validation : envoi du lien dans Messenger ---- */
+const validationUrl = p => new URL("valider.html?t=" + encodeURIComponent(p.validation_token), location.href).href;
+async function sendForValidation(id){
+  const p = getPost(id); if(!p) return;
+  if(!meM()){ openWhoAmI(() => sendForValidation(id)); return; }
+  if(!p.caption && !media(p).length){ toast("Ajoute au moins un visuel ou un texte avant d'envoyer pour validation."); return; }
+  const token = p.validation_token || crypto.randomUUID();
+  const ok = await patchPost(id, {status:"validation", validation_token:token, validation_sent_at:new Date().toISOString()});
+  if(!ok) return;
+  p.validation_token = token; p.status = "validation";
+  await notify(cheffes().map(m=>m.id), {post:p, kind:"validation", title:"👀 Un post attend ton feu vert", body:`${myName()} propose « ${p.title} »${whenTxt(p)}.`});
+  openShare(id);
+}
+function openShare(id){
+  const p = getPost(id); if(!p || !p.validation_token) return;
+  const url = validationUrl(p);
+  const names = (S.reglages?.validatrices||[]).join(" ou ");
+  const msg = `👀 Nouveau post à valider : « ${p.title} »${whenTxt(p)}\n\nVisuel et texte ici 👉 ${url}\n\nUn clic pour valider ou demander une modif. Merci ${names} 🙏`;
+  const messenger = safeUrl(S.reglages?.messenger_url);
+  const canShare = !!navigator.share && /Android|iPhone|iPad/i.test(navigator.userAgent);
+  openOv(2, `<div class="modal narrow" role="dialog" aria-modal="true" aria-labelledby="sh-t"><div class="m-head"><h2 id="sh-t">Envoyer pour validation</h2><button class="x" type="button" data-action="close2" aria-label="Fermer">×</button></div>
+    <div class="m-body">
+      <p style="margin:0">Le post est passé « À valider ». Envoie maintenant le lien dans la conversation Messenger : <b>${esc(names)}</b> pourront regarder le visuel et le texte, et valider en un clic, sans code.</p>
+      <label class="f"><span class="sr">Message</span><textarea id="sh-msg" readonly style="min-height:150px">${esc(msg)}</textarea></label>
+      ${canShare ? `<button class="btn primary" type="button" id="sh-share">📤 Partager dans Messenger</button>` : ""}
+      <div class="copyrow" style="margin:0">
+        <button class="btn ${canShare?"":"primary"}" type="button" id="sh-copy">1. Copier le message</button>
+        ${messenger ? `<a class="btn turq" href="${esc(messenger)}" target="_blank" rel="noopener">2. Ouvrir la conversation</a>` : ""}
+      </div>
+      <p class="hint" style="margin:0">${canShare ? "Avec « Partager », choisis Messenger puis la conversation." : "Copie le message, ouvre la conversation Messenger, colle (Ctrl+V) et envoie."}</p>
+    </div>
+    <div class="m-foot"><button class="btn small ghost" type="button" id="sh-link">Copier seulement le lien</button><span class="spacer"></span><button class="btn" type="button" data-action="close2">Fermer</button></div></div>`);
+  const sh = $("#sh-share"); if(sh) sh.onclick = async () => { try{ await navigator.share({text:msg}); }catch(e){} };
+  $("#sh-copy").onclick = () => copyText(msg);
+  $("#sh-link").onclick = () => copyText(url);
+}
+
+/* ---- Ma to-do ---- */
+function todoFor(id){
+  const m = member(id); if(!m) return [];
+  const items = [];
+  S.posts.forEach(p => {
+    const s = effStatus(p), prep = ["idee","creation"].includes(s);
+    if(prep && p.visual_by===id && !p.visual_done_at) items.push({p, kind:"visuel", ico:"🎨", label:"Faire le visuel", action:["visual-done","Visuel terminé"]});
+    if(prep && p.wording_by===id && !p.wording_done_at){
+      const waiting = p.visual_by && !p.visual_done_at;
+      items.push({p, kind:"texte", ico:"✍️", label: waiting ? "Écrire le texte (en attente du visuel)" : "Écrire le texte", waiting, action: waiting ? null : ["wording-done","Texte terminé"]});
+    }
+    const prepDone = (!p.visual_by || p.visual_done_at) && (!p.wording_by || p.wording_done_at) && (p.visual_done_at || p.wording_done_at);
+    if(prep && prepDone && (p.created_by===id || p.wording_by===id || (!p.wording_by && p.visual_by===id))) items.push({p, kind:"envoyer", ico:"👀", label:"Envoyer pour validation", action:["send-validation","Envoyer"]});
+    if(s==="validation" && m.is_cheffe && !(p.approvals||[]).some(a => norm(a.name)===norm(m.name))) items.push({p, kind:"valider", ico:"✅", label:"Donner ton feu vert", action:["approve","Feu vert ✓"]});
+    if(s==="pret" && p.assignee===id) items.push({p, kind:"poster", ico:"📣", label:"Poster", action:null, poster:true});
+  });
+  if(id===S.me) (S.notifs||[]).filter(n => n.kind==="mention" && !n.read_at && getPost(n.post_id)).forEach(n => items.push({p:getPost(n.post_id), kind:"tag", ico:"💬", label:n.title, nid:n.id, due:"0000", action:null}));
+  return items;
+}
+function renderTodo(){
+  if(!S.todoFor || !member(S.todoFor)) S.todoFor = S.me;
+  const who = member(S.todoFor);
+  let html = `<div class="toolbar"><label class="toggle" for="todo-who" style="color:var(--ink)">To-do de</label><select id="todo-who" class="inp" style="width:auto" data-action="todo-who">${S.team.map(m=>`<option value="${esc(m.id)}" ${m.id===S.todoFor?"selected":""}>${esc(m.name)}${m.id===S.me?" (moi)":""}</option>`).join("")}</select></div>`;
+  if(!who){ return html + `<div class="empty-state"><strong>Dis-nous qui tu es</strong>Touche « Qui es-tu ? » en haut pour voir ta liste.</div>`; }
+  const t = today(), tm = addDays(t,1), w = addDays(t,7);
+  const items = todoFor(who.id).map(it => ({...it, due: it.due ?? it.p.date ?? ""}));
+  items.sort((a,b) => (a.due||"9999")<(b.due||"9999")?-1:(a.due||"9999")>(b.due||"9999")?1:(a.p.time||"")<(b.p.time||"")?-1:1);
+  const groups = [
+    ["late","En retard", it => it.due && it.due!=="0000" && it.due < t],
+    ["today","Aujourd'hui", it => it.due===t || it.due==="0000"],
+    ["tomorrow","Demain", it => it.due===tm],
+    ["week","Cette semaine", it => it.due > tm && it.due <= w],
+    ["later","Plus tard", it => it.due > w],
+    ["nodate","Sans date", it => !it.due]
+  ];
+  if(!items.length) html += `<div class="empty-state"><strong>${who.id===S.me?"Rien à faire, profite !":"Rien à faire pour "+esc(who.name)}</strong>Les tâches apparaissent ici dès qu'on confie un visuel, un texte, une publication ou une validation.</div>`;
+  for(const [k,label,fn] of groups){
+    const arr = items.filter(fn); if(!arr.length) continue;
+    html += `<section class="group ${k}"><div class="group-h"><h2>${label}</h2><span class="count">${arr.length} tâche${arr.length>1?"s":""}</span></div><div class="todo">${arr.map(todoRowHTML).join("")}</div></section>`;
+  }
+  const sg = suggestionsHTML();
+  if(sg) html += sg;
+  return html;
+}
+function todoRowHTML(it){
+  const p = it.p, ms = media(p);
+  const act = it.poster
+    ? platforms(p).filter(k => !handled(p,k)).map(k => `<button class="pfbtn" type="button" data-action="publish" data-id="${p.id}" data-pf="${k}">${pfIcon(k)}J'ai publié</button>`).join("") + (p.date ? `<button class="pfbtn sched" type="button" data-action="schedule" data-id="${p.id}">⏱ Programmé</button>` : "") + (p.caption ? `<button class="btn small" type="button" data-action="copy" data-id="${p.id}">Copier le texte</button>` : "")
+    : it.action ? `<button class="btn small ${it.kind==="envoyer"?"primary":"turq"}" type="button" data-action="${it.action[0]}" data-id="${p.id}">${it.action[1]}</button>` : "";
+  return `<div class="todo-row k-${it.kind}${it.waiting?" waiting":""}" data-open="${p.id}" role="button" tabindex="0"${it.nid?` data-nid="${esc(it.nid)}"`:""}>
+    <span class="todo-ico" aria-hidden="true">${it.ico}</span>
+    <div class="todo-b"><b>${esc(it.label)}</b><span>« ${esc(p.title)} »</span><small>${p.date?`Post prévu ${esc(fmtWhen(p))}`:"Pas encore de date"} · ${esc(rub(p).label)}</small></div>
+    <div class="todo-act">${act}</div>
+    <div class="todo-thumb">${ms.length?mediaHTML(ms[0]):""}</div></div>`;
+}
+
+/* ---- Réglages ---- */
+function openSettings(){
+  closeOv(2);
+  const r = S.reglages || {};
+  const evs = (S.events||[]).map(e => `<div class="teamrow"><span style="flex:1"><b>${esc(e.titre)}</b> <small class="hint">${esc(fmtShort(String(e.date).slice(0,10)))}${e.recurrent?" · chaque année":""}</small></span><button class="x" type="button" data-del-ev="${esc(e.id)}" aria-label="Supprimer">×</button></div>`).join("");
+  const favs = (S.favoris||[]).map(f => `<div class="teamrow"><span style="flex:1"><b>${esc(f.label)}</b> <small class="hint">${f.kind==="hashtags"?"hashtags":"texte"}</small><br><small>${esc(f.contenu.slice(0,90))}${f.contenu.length>90?"…":""}</small></span><button class="x" type="button" data-del-fav="${esc(f.id)}" aria-label="Supprimer">×</button></div>`).join("");
+  openOv(1, `<div class="modal narrow" role="dialog" aria-modal="true" aria-labelledby="st-t"><div class="m-head"><h2 id="st-t">Réglages</h2><button class="x" type="button" data-action="close1" aria-label="Fermer">×</button></div>
+    <div class="m-body">
+      ${S.v3missing ? `<div class="valbox warn"><p>La mise à jour de la base (mise-a-jour-v3.sql) n'a pas encore été lancée dans Supabase : ces réglages ne peuvent pas être enregistrés.</p></div>` : ""}
+      <label class="f">Objectif de posts par semaine<input class="inp" type="number" id="st-obj" min="1" max="21" value="${esc(r.objectif_semaine||3)}" style="max-width:120px"></label>
+      <label class="f">Lien de la conversation Messenger pour la validation<input class="inp" type="url" id="st-msg" value="${esc(r.messenger_url||"")}"></label>
+      <label class="f">Validatrices <span class="h">Prénoms proposés sur la page de validation, séparés par des virgules (y compris celles qui ne sont pas dans l'appli).</span><input class="inp" type="text" id="st-val" value="${esc((r.validatrices||[]).join(", "))}"></label>
+      <button class="btn primary" type="button" id="st-save" style="align-self:flex-start">Enregistrer les réglages</button>
+      <div class="sec"><h4>Textes et hashtags favoris</h4><div style="display:flex;flex-direction:column;gap:8px">${favs||`<p class="hint" style="margin:0">Aucun favori.</p>`}</div>
+        <form id="fav-add" style="display:grid;gap:8px;margin-top:10px"><div class="row2"><input class="inp" id="fav-label" placeholder="Nom (ex. Lien HelloAsso)" required><select class="inp" id="fav-kind"><option value="texte">Texte</option><option value="hashtags">Hashtags</option></select></div><textarea class="inp" id="fav-txt" placeholder="Le texte ou les hashtags à insérer" required style="min-height:70px"></textarea><button class="btn small" type="submit" style="justify-self:start">+ Ajouter le favori</button></form></div>
+      <div class="sec"><h4>Dates de l'asso</h4><p class="hint" style="margin:0 0 8px">Journées d'adoption, AG, brocantes… Elles s'affichent dans le calendrier et l'appli propose un post 3 semaines avant.</p><div style="display:flex;flex-direction:column;gap:8px">${evs||""}</div>
+        <button class="btn small" type="button" id="ev-add-btn" style="margin-top:8px">+ Ajouter une date</button></div>
+    </div></div>`, "settings");
+  $("#st-save").onclick = async () => {
+    const obj = Math.max(1, Math.min(21, +$("#st-obj").value || 3));
+    const vals = $("#st-val").value.split(",").map(s=>s.trim()).filter(Boolean);
+    const ok = await run(S.sb.from("reglages").upsert({id:1, objectif_semaine:obj, messenger_url:$("#st-msg").value.trim(), validatrices:vals, updated_at:new Date().toISOString()}), "Réglages enregistrés.");
+    if(ok){ await loadExtras().catch(()=>{}); render(); }
+  };
+  $("#fav-add").onsubmit = async e => { e.preventDefault();
+    const ok = await run(S.sb.from("favoris").insert({label:$("#fav-label").value.trim(), kind:$("#fav-kind").value, contenu:$("#fav-txt").value.trim()}), "Favori ajouté.");
+    if(ok){ await loadExtras().catch(()=>{}); openSettings(); } };
+  $("#ov1").querySelectorAll("[data-del-fav]").forEach(b => b.onclick = async () => { if(await run(S.sb.from("favoris").delete().eq("id", b.dataset.delFav))){ await loadExtras().catch(()=>{}); openSettings(); } });
+  $("#ov1").querySelectorAll("[data-del-ev]").forEach(b => b.onclick = async () => { if(await run(S.sb.from("evenements").delete().eq("id", b.dataset.delEv))){ await loadExtras().catch(()=>{}); openSettings(); render(); } });
+  $("#ev-add-btn").onclick = () => openEventForm(today(), openSettings);
+}
+function openEventForm(ds, after){
+  openOv(2, `<form class="modal narrow" role="dialog" aria-modal="true" aria-labelledby="ev-t" id="ev-form"><div class="m-head"><h2 id="ev-t">Ajouter une date de l'asso</h2><button class="x" type="button" data-action="close2" aria-label="Fermer">×</button></div>
+    <div class="m-body"><label class="f">Quoi ?<input class="inp" id="ev-titre" placeholder="Ex. Journée d'adoption à Villefranche" required autofocus></label>
+      <label class="f">Date<input class="inp" type="date" id="ev-date" value="${esc(ds)}" required></label>
+      <label class="toggle"><input type="checkbox" id="ev-rec"> Revient chaque année à la même date</label>
+      <label class="f">Note <span class="h">Facultatif : idée de post, infos utiles…</span><input class="inp" id="ev-note"></label></div>
+    <div class="m-foot"><span class="spacer"></span><button class="btn" type="button" data-action="close2">Annuler</button><button class="btn primary" type="submit">Ajouter</button></div></form>`);
+  $("#ev-form").onsubmit = async e => { e.preventDefault();
+    const ok = await run(S.sb.from("evenements").insert({titre:$("#ev-titre").value.trim(), date:$("#ev-date").value, recurrent:$("#ev-rec").checked, note:$("#ev-note").value.trim()}), "Date ajoutée au calendrier.");
+    if(ok){ closeOv(2); await loadExtras().catch(()=>{}); render(); after && after(); } };
+}
+
+/* ---- Favoris dans l'éditeur ---- */
+function favChipsHTML(kind, target){
+  const list = (S.favoris||[]).filter(f => f.kind===kind);
+  if(!list.length) return "";
+  return `<div class="favs">${list.map(f => `<button type="button" class="fav" data-fav="${esc(f.id)}" data-target="${target}" title="${esc(f.contenu)}">+ ${esc(f.label)}</button>`).join("")}</div>`;
+}
+function insertFav(id, target){
+  const f = (S.favoris||[]).find(x => x.id===id); const el = $(target); if(!f || !el) return;
+  if(target==="#f-hashtags"){ const cur = el.value.split(/\s+/).filter(Boolean); f.contenu.split(/\s+/).forEach(h => { if(h && !cur.includes(h)) cur.push(h); }); el.value = cur.join(" "); }
+  else { const pos = el.selectionStart ?? el.value.length; const before = el.value.slice(0,pos), after = el.value.slice(pos); const sep = before && !before.endsWith("\n") ? "\n\n" : ""; el.value = before + sep + f.contenu + after; }
+  el.dispatchEvent(new Event("input")); el.focus();
+}
+
 /* ================== Événements ================== */
 document.addEventListener("click", async e => {
+  const fv = e.target.closest("[data-fav]"); if(fv){ insertFav(fv.dataset.fav, fv.dataset.target); return; }
   const a = e.target.closest("[data-action]");
   if(a && a.tagName!=="FORM" && a.tagName!=="INPUT" && a.tagName!=="SELECT"){
     const act = a.dataset.action, id = a.dataset.id;
@@ -991,6 +1647,20 @@ document.addEventListener("click", async e => {
       case "publish": markPublished(id, a.dataset.pf); break;
       case "unpublish": unmarkPublished(id, a.dataset.pf); break;
       case "take": takePost(id); break;
+      case "schedule": markScheduled(id, a.dataset.pf ? [a.dataset.pf] : null); break;
+      case "approve": approvePost(id); break;
+      case "revise": openRevise(id); break;
+      case "ask-validation": case "send-validation": sendForValidation(id); break;
+      case "share-validation": openShare(id); break;
+      case "visual-done": visualDone(id); break;
+      case "wording-done": wordingDone(id); break;
+      case "undo-step": undoStep(id, a.dataset.k); break;
+      case "templates": openTemplates(); break;
+      case "use-sugg": { const sg = (S._sugg||[])[+a.dataset.i]; if(sg) createFromTemplate(sg.tpl, sg); break; }
+      case "prep-event": { const ev = (S._dayEvents||[])[+a.dataset.i]; if(ev) createFromTemplate(ev.tpl, {date:ev.date, event_key:ev.key, label:ev.titre}); break; }
+      case "add-event": openEventForm(a.dataset.day || today()); break;
+      case "settings": openSettings(); break;
+      case "notifs": openNotifs(); break;
       case "edit": $("#ov1").dataset.kind=""; openEditor(id); break;
       case "duplicate": $("#ov1").dataset.kind=""; openEditor(null, null, id); break;
       case "delete": { const p=getPost(id); confirmBox("Supprimer ce post ?", `« ${p?.title||"Sans titre"} » sera supprimé pour toute l'équipe, avec ses visuels.`, "Supprimer", async () => {
@@ -998,7 +1668,10 @@ document.addEventListener("click", async e => {
           const ok = await run(S.sb.from("posts").delete().eq("id", id), "Post supprimé.");
           if(ok){ removeFiles(paths).catch(()=>{}); S.posts = S.posts.filter(x=>x.id!==id); closeOv(1); render(); }
         }); break; }
-      case "advance": await patchPost(id, {status:a.dataset.to}, a.dataset.to==="pret" ? "Prêt ! Il apparaît dans « À poster »." : "C'est parti !"); break;
+      case "advance":
+        if(a.dataset.to==="validation"){ await sendForValidation(id); break; }
+        if(a.dataset.to==="pret" && getPost(id)?.status==="validation"){ await approvePost(id); break; }
+        await patchPost(id, {status:a.dataset.to}, a.dataset.to==="pret" ? "Prêt ! Il apparaît dans « À poster »." : "C'est parti !"); break;
       case "pf-filter": S.platform=a.dataset.pf; render(); break;
       case "feed-pf": S.feedPf=a.dataset.pf; render(); break;
       case "cal": { const d=+a.dataset.d; if(d===0){ const n=new Date(); S.calMonth=new Date(n.getFullYear(),n.getMonth(),1); S.selDay=today(); } else S.calMonth=new Date(S.calMonth.getFullYear(), S.calMonth.getMonth()+d, 1); render(); break; }
@@ -1017,7 +1690,10 @@ document.addEventListener("change", async e => {
   const t = e.target, act = t.dataset.action;
   if(act==="mine"){ S.mineOnly=t.checked; try{ localStorage.setItem("chamania-mine", t.checked?"1":"0"); }catch(_){} render(); }
   else if(act==="feed-drafts"){ S.feedDrafts=t.checked; render(); }
-  else if(act==="assign"){ t.blur(); await patchPost(t.dataset.id, {assignee:t.value||null}, "C'est noté."); }
+  else if(act==="todo-who"){ S.todoFor=t.value; render(); }
+  else if(act==="role"){ t.blur(); await setRole(t.dataset.id, t.dataset.role, t.value); }
+  else if(act==="assign"){ t.blur(); const p=getPost(t.dataset.id); await patchPost(t.dataset.id, {assignee:t.value||null}, "C'est noté.");
+    if(p && t.value) await notify([t.value], {post:p, kind:"assign", title:`📌 ${myName()} t'a confié un post`, body:`« ${p.title} »${whenTxt(p)}.`}); }
   else if(act==="publink"){ const url=t.value.trim(); t.blur(); await run(S.sb.rpc("set_published", {p_post:t.dataset.id, p_platform:t.dataset.pf, p_url:url}), "Lien enregistré."); refreshSoon("posts"); }
 });
 document.addEventListener("submit", async e => {
@@ -1030,6 +1706,9 @@ document.addEventListener("submit", async e => {
   if(act==="comment"){ e.preventDefault(); const inp=f.querySelector("input"); const text=inp.value.trim(); if(!text) return;
     inp.value=""; inp.blur();
     const ok = await run(S.sb.from("comments").insert({post_id:f.dataset.id, text, author:meM()?S.me:null}));
+    const sug = $("#msug"); if(sug) sug.innerHTML = "";
+    const pp = getPost(f.dataset.id), tagged = mentionedIds(text);
+    if(ok && pp && tagged.length){ await notify(tagged, {post:pp, kind:"mention", title:`💬 ${myName()} t'a taguée`, body:`« ${pp.title} » : ${text}`}); toast(`${tagged.length>1?"Elles seront prévenues":"Elle sera prévenue"} par notification.`); }
     if(ok){ await loadComments().catch(()=>{}); render(); }
   }
 });
@@ -1111,11 +1790,12 @@ async function onSession(session){
   try{ await loadAll(); subscribe(); }
   catch(e){ console.error(e); S.error = "Le planning n'a pas pu être chargé. Vérifie ta connexion puis recharge la page."; }
   render();
-  if(S.loaded && !meM()) openWhoAmI();
+  if(S.loaded && !meM()) openWhoAmI(); else if(S.loaded){ syncPush(); }
+  handleHash(); openPending();
 }
 
 /* ================== Démarrage ================== */
-setView(location.hash.slice(1) || "a-poster");
+setView(location.hash.slice(1) || "todo");
 (async () => {
   if(!window.supabase || !CFG.SUPABASE_URL || /VOTRE-PROJET/.test(CFG.SUPABASE_URL)){
     document.body.classList.add("logged-out");
