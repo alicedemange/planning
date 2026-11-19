@@ -37,6 +37,8 @@ h2{font-family:var(--display);font-weight:400;font-size:26px;margin:0 0 6px;line
 .meta b{color:var(--ink)}
 .gallery{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -16px;padding:0 16px 4px}
 .gallery figure{margin:0;flex:0 0 88%;scroll-snap-align:center;border-radius:14px;overflow:hidden;background:var(--rose-wash);aspect-ratio:4/5}
+.gallery.story figure{aspect-ratio:9/16;flex-basis:72%;background:#000}
+.gallery.story img,.gallery.story video{object-fit:contain}
 .gallery figure:only-child{flex-basis:100%}
 .gallery img,.gallery video{width:100%;height:100%;object-fit:cover;display:block}
 .count{font-size:13px;color:var(--muted);text-align:center;margin-top:6px}
@@ -111,7 +113,7 @@ function render(){
       <h2>${esc(p.title)}</h2>
       <div class="meta"><span>📅 <b>${esc(when(p))}</b></span><span>📍 ${esc((p.platforms||[]).map(k => PF[k]||k).join(" + ") || "réseau à choisir")}</span><span>${esc(FORMATS[p.format] || "Post")}</span></div>
     </section>
-    ${media.length ? `<section><div class="gallery" id="gal">${media.map((m,i) => `<figure>${m.type==="video" ? `<video src="${esc(mediaUrl(m))}" controls playsinline preload="metadata"></video>` : `<img src="${esc(mediaUrl(m))}" alt="Visuel ${i+1}">`}</figure>`).join("")}</div>${media.length>1?`<p class="count">${media.length} visuels · fais glisser pour tout voir</p>`:""}</section>` : `<div class="banner warn">Pas encore de visuel sur ce post.</div>`}
+    ${media.length ? `<section><div class="gallery${p.format==="story"?" story":""}" id="gal">${media.map((m,i) => `<figure>${m.type==="video" ? `<video src="${esc(mediaUrl(m))}" controls playsinline preload="metadata"></video>` : `<img src="${esc(mediaUrl(m))}" alt="Visuel ${i+1}">`}</figure>`).join("")}</div>${media.length>1?`<p class="count">${media.length} visuels · fais glisser pour tout voir</p>`:""}</section>` : `<div class="banner warn">Pas encore de visuel sur ce post.</div>`}
     <section class="card"><p class="sec-t">Texte du post</p>${p.caption ? `<div class="caption">${esc(p.caption)}</div>` : `<p class="hint" style="margin:0">Pas encore de texte.</p>`}${p.hashtags ? `<div class="tags">${esc(p.hashtags)}</div>` : ""}</section>
     ${appr.length ? `<section class="card"><p class="sec-t">Avis déjà donnés</p>${appr.map(a => `<div class="appr">${a.ok?"✅":"🔁"} <b>${esc(a.name)}</b> ${a.ok?"a validé":"demande des modifs"}${a.comment ? ` : « ${esc(a.comment)} »` : ""}<small>${esc(stamp(a.at))}</small></div>`).join("")}</section>` : ""}
     <section class="card" id="form">
