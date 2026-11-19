@@ -1,5 +1,5 @@
 // =====================================================================
-//  Envoi des notifications du planning Cha'mania (lancé par GitHub Actions)
+//  Envoi des notifications du planning Cha'Mania (lancé par GitHub Actions)
 //  1. Crée le rappel "N'oublie pas de me poster" (10 min avant l'heure prévue)
 //  2. Le lundi matin, crée le récap de la semaine pour chacune
 //  3. Envoie sur les téléphones toutes les notifications en attente
@@ -89,7 +89,7 @@ if (parisNow.weekday === "Mon" && +parisNow.hour >= 8) {
       const a = week.filter(p => p.assignee === m.id && ["validation", "pret"].includes(p.status)).length;
       const parts = [v && `${v} visuel${v > 1 ? "s" : ""}`, w && `${w} texte${w > 1 ? "s" : ""}`, a && `${a} post${a > 1 ? "s" : ""} à publier`].filter(Boolean);
       await api("notifications", { method: "POST", body: JSON.stringify({ membre_id: m.id, kind: "recap",
-        title: "🗓️ Ta semaine Cha'mania",
+        title: "🗓️ Ta semaine Cha'Mania",
         body: (parts.length ? `Pour toi : ${parts.join(", ")}. ` : "Rien de prévu pour toi cette semaine. ") + `Équipe : ${planned}/${reg.objectif_semaine || 3} posts prévus.` }) });
       created++;
     }
