@@ -1,7 +1,7 @@
 {
-  "name": "Planning réseaux Cha'mania",
-  "short_name": "Cha'mania",
-  "description": "Planning des posts réseaux sociaux de l'association Cha'mania",
+  "name": "Planning réseaux Cha'Mania",
+  "short_name": "Cha'Mania",
+  "description": "Planning des posts réseaux sociaux de l'association Cha'Mania",
   "lang": "fr",
   "start_url": "./#a-poster",
   "scope": "./",
