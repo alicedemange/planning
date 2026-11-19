@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Validation d'un post · Cha'mania</title>
+<title>Validation d'un post · Cha'Mania</title>
 <meta name="robots" content="noindex">
-<meta property="og:title" content="👀 Un post Cha'mania attend ta validation">
+<meta property="og:title" content="👀 Un post Cha'Mania attend ta validation">
 <meta property="og:description" content="Regarde le visuel et le texte, puis valide ou demande une modification en un clic.">
 <meta name="theme-color" content="#f75b95">
 <link rel="icon" href="icon-192.png">
@@ -70,7 +70,7 @@ textarea{width:100%;min-height:90px;border:1px solid var(--line);border-radius:1
 <main id="app">
   <header>
     <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 35 C8 26 3 19 3 12.5 C3 7.5 7 4 11.5 4 C15 4 18 6 20 9 C22 6 25 4 28.5 4 C33 4 37 7.5 37 12.5 C37 19 32 26 20 35Z" fill="#f75b95"/><path d="M13 21 l2-5 2 3 h6 l2-3 2 5 c0 4-3 7-7 7 s-7-3-7-7z" fill="#fffcf7"/><circle cx="17.5" cy="22" r="1" fill="#1f1a1d"/><circle cx="22.5" cy="22" r="1" fill="#1f1a1d"/></svg>
-    <div><h1>Cha'mania</h1><small>Validation d'un post</small></div>
+    <div><h1>Cha'Mania</h1><small>Validation d'un post</small></div>
   </header>
   <div id="content"><p class="hint">Chargement du post…</p></div>
 </main>
@@ -148,7 +148,7 @@ async function submit(ok){
   const {data, error} = await sb.rpc("get_validation", {p_token: token});
   if(error){ fail("Impossible de charger le post : " + error.message); return; }
   if(!data){ fail("Ce lien de validation n'existe plus (le post a peut-être été supprimé)."); return; }
-  post = data; document.title = "Valider : " + post.title + " · Cha'mania"; render();
+  post = data; document.title = "Valider : " + post.title + " · Cha'Mania"; render();
 })();
 </script>
 </body>
